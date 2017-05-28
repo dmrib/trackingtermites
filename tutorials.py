@@ -80,5 +80,45 @@ def tutorial_five():
         if q == 27:
             break
 
+def tutorial_six():
+    cap = cv2.VideoCapture(-1)
+
+    while True:
+        _, frame = cap.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+        sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)
+        sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=5)
+        canny = cv2.Canny(frame, 50, 50)
+
+        cv2.imshow('original', frame)
+        cv2.imshow('gray', gray)
+        cv2.imshow('laplacian', laplacian)
+        cv2.imshow('sobelx', sobelx)
+        cv2.imshow('sobely', sobely)
+        cv2.imshow('canny', canny)
+
+        q = cv2.waitKey(5) & 0xFF
+        if q == 27:
+            break
+
+def tutorial_seven():
+    img = cv2.imread('images/patri.jpg', 1)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    template = cv2.imread('images/termite-04.jpg', 0)
+
+    w, h = template.shape[::-1]
+
+    res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
+    threshold = 0.2
+    loc = np.where(res >= threshold)
+
+    for pt in zip(*loc[::-1]):
+        cv2.rectangle(img, pt, (pt[0]+w, pt[1]+h), (0,255,255), 1)
+
+    cv2.imshow('detected', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 if __name__ == '__main__':
-    tutorial_five()
+    tutorial_seven()
