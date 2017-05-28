@@ -43,5 +43,22 @@ def tutorial_three():
     cv2.waitKey()
     cv2.destroyAllWindows()
 
+def tutorial_four():
+    img = cv2.imread('images/termite-01.jpg', cv2.IMREAD_COLOR)
+
+    px = img[55, 55]
+    print(px)
+
+    img[55, 55] = [255, 255, 255]
+    print(img[55, 55])
+
+    roi = img[10: 30][10: 60]
+    print(roi)
+
+    img[10: 30][10: 60] = (0, 0, 0)
+    cv2.imshow('img', img)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+
 if __name__ == '__main__':
-    tutorial_three()
+    tutorial_four()
