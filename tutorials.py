@@ -120,5 +120,23 @@ def tutorial_seven():
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def first_try():
+    img = cv2.imread('images/otto-1.jpg', 1)
+    img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
+    template = cv2.imread('images/otto-template.png', 1)
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
+    threshold = 0.7325
+    loc = np.where(res >= threshold)
+
+    for pt in zip(*loc[::-1]):
+        cv2.putText(img, 'Cat', pt, font, 1, (200, 120, 30), 2, cv2.LINE_AA)
+
+    cv2.imshow('detected', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 if __name__ == '__main__':
-    tutorial_seven()
+    first_try()
