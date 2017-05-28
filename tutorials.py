@@ -60,5 +60,25 @@ def tutorial_four():
     cv2.waitKey()
     cv2.destroyAllWindows()
 
+def tutorial_five():
+    cap = cv2.VideoCapture(-1)
+
+    while True:
+        _, frame = cap.read()
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        lower = np.array([0, 255, 255])
+        upper = np.array([255, 255, 255])
+
+        mask = cv2.inRange(hsv, lower, upper)
+        res = cv2.bitwise_and(frame, frame, mask=mask)
+
+        cv2.imshow('raw', frame)
+        cv2.imshow('mask', mask)
+        cv2.imshow('res', res)
+
+        q = cv2.waitKey(5) & 0xFF
+        if q == 27:
+            break
+
 if __name__ == '__main__':
-    tutorial_four()
+    tutorial_five()
