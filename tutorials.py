@@ -110,7 +110,7 @@ def tutorial_seven():
     w, h = template.shape[::-1]
 
     res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.2
+    threshold = 0.5
     loc = np.where(res >= threshold)
 
     for pt in zip(*loc[::-1]):
@@ -125,18 +125,37 @@ def first_try():
     img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
     template = cv2.imread('images/otto-template.png', 1)
 
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    w, h, l = template.shape
 
     res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
     threshold = 0.7325
     loc = np.where(res >= threshold)
 
     for pt in zip(*loc[::-1]):
-        cv2.putText(img, 'Cat', pt, font, 1, (200, 120, 30), 2, cv2.LINE_AA)
+        cv2.rectangle(img, pt, (pt[0]+w, pt[1]+h), (0,255,255), 1)
 
     cv2.imshow('detected', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def tutorial_eight():
+    img1 = cv2.imread('images/otto-template.png', 0)
+    img2 = cv2.imread('images/otto-2.jpg', 0)
+
+    orb = cv2.ORB_create()
+
+    kp1, des1 = orb.detectAndCompute(img1, None)
+    kp2, des2 = orb.detectAndCompute(img2, None)
+
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+    matches = bf.match(des1, des2)
+    matches = sorted(matches, key=lambda x:x.distance)
+    print(len(matches))
+
+    img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:5], None, flags=2)
+    plt.imshow(img3)
+    plt.show()
+
 if __name__ == '__main__':
-    first_try()
+    tutorial_eight()
