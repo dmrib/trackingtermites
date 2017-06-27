@@ -231,5 +231,23 @@ def tutorial_nine():
     cv2.destroyAllWindows()
 
 
+def tutorial_ten():
+    """Perform image color thresholding."""
+    img = cv2.imread('images/patri.jpg', 0)
+
+    _, threshold = cv2.threshold(img, 100, 255, cv2.THRESH_BINARY)
+    adaptative = cv2.adaptiveThreshold(img, 255,
+                                       cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                       cv2.THRESH_BINARY, 115, 1)
+    _, otsu = cv2.threshold(img, 125, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+
+    cv2.imshow('original', img)
+    cv2.imshow('threshold', threshold)
+    cv2.imshow('adaptative', adaptative)
+    cv2.imshow('otsu', otsu)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 if __name__ == '__main__':
-    tutorial_nine()
+    tutorial_ten()
