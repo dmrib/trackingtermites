@@ -23,6 +23,26 @@ class Termite:
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
         self.tracker = None
 
+    def is_colliding(self, others):
+        """Check if termite is colliding with others.
+
+        Args:
+            others (list): termites to be compared.
+        Returns:
+            colliding (bool): True if the termite is colliding.
+        """
+        collisions = 0
+        for other in others:
+            if (self.position[1] < other.position[1] + self.box_size and
+                self.position[1] + self.box_size > other.position[1] and
+                self.position[0] < other.position[0] + self.box_size and
+                self.box_size + self.position[0] > other.position[0]):
+                collisions += 1
+        if collisions > 1:
+            return True
+        else:
+            return False
+
 
 class Experiment:
     """Tracking experiment abstraction."""
@@ -69,10 +89,10 @@ class Experiment:
             self.termites.append(termite)
 
     def update_termites(self, frame):
-        """Update termite position to the one in the passed frame.
+        """Update termites positions.
 
         Args:
-            frame (numpy.ndarray): video frame.
+            frame (numpy.ndarray): next video frame.
 
         Returns:
             None.
@@ -84,7 +104,7 @@ class Experiment:
         """Draw bounding box in the tracked termites.
 
         Args:
-            frame (numpy.ndarray): video frame.
+            frame (numpy.ndarray): next video frame.
 
         Returns:
             None.
@@ -93,7 +113,10 @@ class Experiment:
             origin = (int(termite.position[0]), int(termite.position[1]))
             end = (int(termite.position[0] + termite.position[2]),
                   int(termite.position[1] + termite.position[3]))
-            cv2.rectangle(frame, origin, end, termite.color)
+            if termite.is_colliding(self.termites):
+                cv2.rectangle(frame, origin, end, termite.color, 5)
+            else:
+                cv2.rectangle(frame, origin, end, termite.color)
 
     def track_all(self):
         """Start tracking loop.
