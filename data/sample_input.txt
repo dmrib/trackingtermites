@@ -1,0 +1,16 @@
+### Sample input file for tracking algorithm
+
+# Video source file
+video_source ../data/movie01-n4.MTS
+
+# Number of termites to be tracked
+n_termites 4
+
+# Tracking method
+method KCF
+
+# Bounding box initial size
+box_size 20
+
+# Video source redimesioning size
+video_source_size 640,480
