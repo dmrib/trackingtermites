@@ -27,8 +27,10 @@ class Experiment:
         """Initializer.
 
         Args:
-
+            input_path (str): path of input file.
+            output_path (str): path for output file.
         Returns:
+            None.
 
         """
         self.termites = []
@@ -40,30 +42,52 @@ class Experiment:
         self.locate_termites()
 
     def locate_termites(self):
+        """Open GUI tool for selecting termite to be tracked.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
         if not self.video_source.isOpened():
             print('Could not open video.')
             sys.exit()
 
         ok, frame = self.video_source.read()
-        frame = cv2.resize(frame, self.video_source_size)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if not ok:
             print('Could not read video file.')
             sys.exit()
+        frame = cv2.resize(frame, self.video_source_size)
 
         for _ in range(self.n_termites):
             starting_point = cv2.selectROI(frame, False)
             starting_box = (starting_point[0], starting_point[1], self.box_size, self.box_size)
             termite = Termite(starting_point, self.box_size)
             termite.tracker = cv2.Tracker_create(self.method)
-            termite.tracker.init(gray, starting_box)
+            termite.tracker.init(frame, starting_box)
             self.termites.append(termite)
 
     def update_termites(self, frame):
+        """Update termite position to the one in the passed frame.
+
+        Args:
+            frame (numpy.ndarray): video frame.
+
+        Returns:
+            None.
+        """
         for termite in self.termites:
             ok, termite.position = termite.tracker.update(frame)
 
     def draw(self, frame):
+        """Draw bounding box in the tracked termites.
+
+        Args:
+            frame (numpy.ndarray): video frame.
+
+        Returns:
+            None.
+        """
         for termite in self.termites:
             origin = (int(termite.position[0]), int(termite.position[1]))
             end = (int(termite.position[0] + termite.position[2]),
@@ -71,6 +95,13 @@ class Experiment:
             cv2.rectangle(frame, origin, end, termite.color)
 
     def track_all(self):
+        """Start tracking loop.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
         while True:
             ok, frame = self.video_source.read()
             if not ok:
@@ -87,5 +118,5 @@ class Experiment:
 
 
 if __name__ == '__main__':
-    ex = Experiment(3, 'KCF', '../data/00012.MTS')
+    ex = Experiment(3, 'KCF', '../data/movie01-n4.MTS')
     ex.track_all()
