@@ -40,6 +40,8 @@ class DataHandler:
             y, x = parameters['video_source_size'].rstrip('\n').split(',')
             parameters['video_source_size'] = tuple([int(y), int(x)])
 
+        return parameters
+
     def write_output(self):
         """Write output data to file.
 

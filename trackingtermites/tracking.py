@@ -4,6 +4,9 @@ import sys
 import random
 import cv2
 
+import data
+
+
 class Termite:
     """Termite under study abstraction."""
     def __init__(self, starting_point, box_size=20):
@@ -23,7 +26,7 @@ class Termite:
 
 class Experiment:
     """Tracking experiment abstraction."""
-    def __init__(self, n_termites, method, video_source, box_size = 20, video_source_size=(640, 480)):
+    def __init__(self, input_path, output_path):
         """Initializer.
 
         Args:
@@ -34,11 +37,9 @@ class Experiment:
 
         """
         self.termites = []
-        self.n_termites = n_termites
-        self.method = method
-        self.box_size = box_size
-        self.video_source = cv2.VideoCapture(video_source)
-        self.video_source_size = video_source_size
+        self.data_handler = data.DataHandler(input_path, output_path)
+        self.params = self.data_handler.load_input()
+        self.video_source = cv2.VideoCapture(self.params['video_source'])
         self.locate_termites()
 
     def locate_termites(self):
@@ -57,13 +58,13 @@ class Experiment:
         if not ok:
             print('Could not read video file.')
             sys.exit()
-        frame = cv2.resize(frame, self.video_source_size)
+        frame = cv2.resize(frame, self.params['video_source_size'])
 
-        for _ in range(self.n_termites):
+        for _ in range(self.params['n_termites']):
             starting_point = cv2.selectROI(frame, False)
-            starting_box = (starting_point[0], starting_point[1], self.box_size, self.box_size)
-            termite = Termite(starting_point, self.box_size)
-            termite.tracker = cv2.Tracker_create(self.method)
+            starting_box = (starting_point[0], starting_point[1], self.params['box_size'], self.params['box_size'])
+            termite = Termite(starting_point, self.params['box_size'])
+            termite.tracker = cv2.Tracker_create(self.params['method'])
             termite.tracker.init(frame, starting_box)
             self.termites.append(termite)
 
@@ -107,7 +108,7 @@ class Experiment:
             if not ok:
                 break
             else:
-                frame = cv2.resize(frame, self.video_source_size)
+                frame = cv2.resize(frame, self.params['video_source_size'])
                 self.update_termites(frame)
                 self.draw(frame)
                 cv2.imshow("Tracking", frame)
@@ -118,5 +119,5 @@ class Experiment:
 
 
 if __name__ == '__main__':
-    ex = Experiment(3, 'KCF', '../data/movie01-n4.MTS')
+    ex = Experiment('../data/sample_input.txt', '')
     ex.track_all()
