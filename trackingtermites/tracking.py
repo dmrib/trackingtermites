@@ -22,6 +22,8 @@ class Termite:
         self.box_size = box_size
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
         self.tracker = None
+        self.colliding = False
+        self.path = [self.position[0], self.position[1], self.colliding]
 
     def is_colliding(self, others):
         """Check if termite is colliding with others.
@@ -39,9 +41,9 @@ class Termite:
                 self.box_size + self.position[0] > other.position[0]):
                 collisions += 1
         if collisions > 1:
-            return True
+            self.colliding = True
         else:
-            return False
+            self.colliding = False
 
 
 class Experiment:
@@ -99,6 +101,8 @@ class Experiment:
         """
         for termite in self.termites:
             ok, termite.position = termite.tracker.update(frame)
+            termite.is_colliding(self.termites)
+            termite.path.append([termite.position[0], termite.position[1], termite.colliding])
 
     def draw(self, frame):
         """Draw bounding box in the tracked termites.
@@ -113,7 +117,7 @@ class Experiment:
             origin = (int(termite.position[0]), int(termite.position[1]))
             end = (int(termite.position[0] + termite.position[2]),
                   int(termite.position[1] + termite.position[3]))
-            if termite.is_colliding(self.termites):
+            if termite.colliding:
                 cv2.rectangle(frame, origin, end, termite.color, 5)
             else:
                 cv2.rectangle(frame, origin, end, termite.color)

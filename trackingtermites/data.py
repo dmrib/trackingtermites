@@ -42,7 +42,7 @@ class DataHandler:
 
         return parameters
 
-    def write_output(self):
+    def write_output(self, termites):
         """Write output data to file.
 
         Args:
