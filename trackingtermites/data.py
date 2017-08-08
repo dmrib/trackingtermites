@@ -1,5 +1,7 @@
 """This module contains the data input and output functionalities."""
 
+import os
+
 
 class DataHandler:
     """Input and output data handler class."""
@@ -42,7 +44,7 @@ class DataHandler:
 
         return parameters
 
-    def write_output(self, termites):
+    def write_output(self, params, termites):
         """Write output data to file.
 
         Args:
@@ -50,7 +52,19 @@ class DataHandler:
         Returns:
             None.
         """
-        pass
+        output_path = '../data/' + params['exp_name']
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        for n, termite in enumerate(termites):
+            termite_output = output_path + f'/termite-{n}.dat'
+            with open(termite_output, mode='w', encoding='utf-8') as out_file:
+                out_file.write(f'Termite number: {n}\n')
+                out_file.write(f'Color: {termite.color}\n\n')
+                out_file.write('###\n\n')
+                out_file.write('y, x, colliding\n')
+                for frame, location in enumerate(termite.path):
+                    out_file.write(f'{frame} {location[0]}, {location[1]}, {location[2]}\n')
 
 
 if __name__ == '__main__':
