@@ -9,15 +9,17 @@ import data
 
 class Termite:
     """Termite under study abstraction."""
-    def __init__(self, starting_point, box_size=20):
+    def __init__(self, identity, starting_point, box_size=20):
         """Initializer.
 
         Args:
+            identity (int): termite identity on video
             starting_point (tuple): y and x values for termite starting point.
             box_size (int): bounding box size.
         Returns:
             None.
         """
+        self.identity = identity
         self.position = starting_point
         self.box_size = box_size
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
@@ -82,10 +84,10 @@ class Experiment:
             sys.exit()
         frame = cv2.resize(frame, self.params['video_source_size'])
 
-        for _ in range(self.params['n_termites']):
+        for t_number in range(self.params['n_termites']):
             starting_point = cv2.selectROI(frame, False)
             starting_box = (starting_point[0], starting_point[1], self.params['box_size'], self.params['box_size'])
-            termite = Termite(starting_point, self.params['box_size'])
+            termite = Termite(t_number+1, starting_point, self.params['box_size'])
             termite.tracker = cv2.Tracker_create(self.params['method'])
             termite.tracker.init(frame, starting_box)
             self.termites.append(termite)

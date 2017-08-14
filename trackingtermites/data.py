@@ -56,10 +56,10 @@ class DataHandler:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
-        for n, termite in enumerate(termites):
-            termite_output = output_path + f'/termite-{n}.dat'
+        for termite in termites:
+            termite_output = output_path + f'/termite-{termite.identity}.dat'
             with open(termite_output, mode='w', encoding='utf-8') as out_file:
-                out_file.write(f'Termite number: {n}\n')
+                out_file.write(f'Termite number: {termite.identity}\n')
                 out_file.write(f'Color: {termite.color}\n\n')
                 out_file.write('###\n\n')
                 out_file.write('y, x, colliding\n')

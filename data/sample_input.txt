@@ -1,5 +1,8 @@
 ### Sample input file for tracking algorithm
 
+# Experiment name
+exp_name test-exp
+
 # Video source file
 video_source ../data/movie01-n4.MTS
 
