@@ -46,7 +46,6 @@ class Termite:
         self.colliding_with = colliding_with
 
 
-
 class Experiment:
     """Tracking experiment abstraction."""
     def __init__(self, input_path, output_path):
@@ -131,7 +130,8 @@ class Experiment:
         Returns:
             None.
         """
-        while True:
+        ok = True
+        while ok:
             ok, frame = self.video_source.read()
             if not ok:
                 break
@@ -145,6 +145,8 @@ class Experiment:
             if k == 27:
                 self.data_handler.write_output(self.params, self.termites)
                 break
+
+        self.data_handler.write_output(self.params, self.termites)
 
 
 if __name__ == '__main__':
