@@ -54,6 +54,8 @@ class DataHandler:
         Returns:
             None.
         """
+        header = self.create_header(params)
+
         output_path = '../data/' + params['exp_name']
         if not os.path.exists(output_path):
             os.makedirs(output_path)
@@ -61,13 +63,25 @@ class DataHandler:
         for termite in termites:
             termite_output = output_path + f'/termite-{termite.identity}.dat'
             with open(termite_output, mode='w', encoding='utf-8') as out_file:
-                out_file.write(self.create_header(params))
+                out_file.write(header)
                 out_file.write(f'# Termite number: {termite.identity}\n')
                 out_file.write(f'# Color: {termite.color}\n\n')
                 out_file.write('###\n\n')
                 out_file.write('frame, y, x, colliding\n')
                 for frame, location in enumerate(termite.path):
                     out_file.write(f'{frame}, {location[0]}, {location[1]}, {location[2]}\n')
+
+        summary_output = output_path + '/experiment_summary.txt'
+        with open(summary_output, mode='w', encoding='utf-8') as summ_file:
+            summ_file.write(header)
+            summ_file.write('\n\n###\n\n')
+            for step in range(len(termites[0].path)):
+                for termite in termites:
+                    if not termite.path[step][2]:
+                        summ_file.write(f'{step}, {termite.path[step][0]}, {termite.path[step][1]}, {termite.identity}, 0\n')
+                    else:
+                        for collision in termite.path[step][2]:
+                            summ_file.write(f'{step}, {termite.path[step][0]}, {termite.path[step][1]}, {termite.identity}, {collision}\n')
 
     def create_header(self, params):
         """Creates string summaring an experiment.
