@@ -15,5 +15,14 @@ method KCF
 # Bounding box initial size   ex.14
 box_size 14
 
-# Video source redimesioning size  ex. 640,480
+# Video source redimensioning size  ex. 640,480
 video_source_size 640,480
+
+# Show bounding box
+show_bounding_box True
+
+# Show termite identification label   ex. True, False
+show_labels True
+
+# Highlight collisions   ex. True, False
+highlight_collisions True

@@ -117,10 +117,13 @@ class Experiment:
             origin = (int(termite.position[0]), int(termite.position[1]))
             end = (int(termite.position[0] + termite.position[2]),
                   int(termite.position[1] + termite.position[3]))
-            if termite.colliding_with:
-                cv2.rectangle(frame, origin, end, termite.color, 5)
+            if self.params['show_labels']:
+                cv2.putText(frame, str(termite.identity), (end[0]+5,end[1]+5), cv2.FONT_HERSHEY_SIMPLEX, color=termite.color, fontScale=0.3)
+            if termite.colliding_with and self.params['highlight_collisions']:
+                    cv2.rectangle(frame, origin, end, termite.color, 5)
             else:
-                cv2.rectangle(frame, origin, end, termite.color)
+                if self.params['show_bounding_box']:
+                    cv2.rectangle(frame, origin, end, termite.color)
 
     def track_all(self):
         """Start tracking loop.

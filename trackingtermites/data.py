@@ -43,6 +43,24 @@ class DataHandler:
             y, x = parameters['video_source_size'].rstrip('\n').split(',')
             parameters['video_source_size'] = tuple([int(y), int(x)])
 
+        if 'show_labels' in parameters:
+            if parameters['show_labels'].lower() == 'true':
+                parameters['show_labels'] = True
+            else:
+                parameters['show_labels'] = False
+
+        if 'highlight_collisions' in parameters:
+            if parameters['highlight_collisions'].lower() == 'true':
+                parameters['highlight_collisions'] = True
+            else:
+                parameters['highlight_collisions'] = False
+
+        if 'show_bounding_box' in parameters:
+            if parameters['show_bounding_box'].lower() == 'true':
+                parameters['show_bounding_box'] = True
+            else:
+                parameters['show_bounding_box'] = False
+
         return parameters
 
     def write_output(self, params, termites):
