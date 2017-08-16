@@ -1,5 +1,6 @@
 """This module contains the data input and output functionalities."""
 
+import datetime
 import os
 
 
@@ -48,7 +49,8 @@ class DataHandler:
         """Write output data to file.
 
         Args:
-            None.
+            params (dict): experiment parameters.
+            termites (list): experiment termites.
         Returns:
             None.
         """
@@ -59,12 +61,27 @@ class DataHandler:
         for termite in termites:
             termite_output = output_path + f'/termite-{termite.identity}.dat'
             with open(termite_output, mode='w', encoding='utf-8') as out_file:
-                out_file.write(f'Termite number: {termite.identity}\n')
-                out_file.write(f'Color: {termite.color}\n\n')
+                out_file.write(self.create_header(params))
+                out_file.write(f'# Termite number: {termite.identity}\n')
+                out_file.write(f'# Color: {termite.color}\n\n')
                 out_file.write('###\n\n')
                 out_file.write('frame, y, x, colliding\n')
                 for frame, location in enumerate(termite.path):
                     out_file.write(f'{frame}, {location[0]}, {location[1]}, {location[2]}\n')
+
+    def create_header(self, params):
+        """Creates string summaring an experiment.
+
+        Args:
+            params (dict): experiment params.
+        Returns:
+            header (str): experiment header.
+        """
+        header = ''
+        header += '# Date: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n'
+        header += '# Movie name: ' + params['video_source'].split('/')[-1] + '\n'
+
+        return header
 
 
 if __name__ == '__main__':
