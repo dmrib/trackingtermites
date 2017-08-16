@@ -71,8 +71,9 @@ class DataHandler:
                 for frame, location in enumerate(termite.path):
                     out_file.write(f'{frame}, {location[0]}, {location[1]}, {location[2]}\n')
 
-        summary_output = output_path + '/experiment_summary.txt'
+        summary_output = output_path + '/experiment_summary.dat'
         with open(summary_output, mode='w', encoding='utf-8') as summ_file:
+            summ_file.write('# Experiment summary\n')
             summ_file.write(header)
             summ_file.write('\n\n###\n\n')
             for step in range(len(termites[0].path)):
