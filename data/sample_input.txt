@@ -1,19 +1,19 @@
 ### Sample input file for tracking algorithm
 
 # Experiment name
-exp_name test-exp
+exp_name development
 
-# Video source file
-video_source ../data/movie01-n4.MTS
+# Video source file path relative to script location
+video_source ../data/00012.MTS
 
 # Number of termites to be tracked
 n_termites 4
 
-# Tracking method
+# Tracking method   ex. MIL, KCF, MEDIANFLOW, TLD
 method KCF
 
-# Bounding box initial size
-box_size 20
+# Bounding box initial size   ex.14
+box_size 14
 
-# Video source redimesioning size
+# Video source redimesioning size  ex. 640,480
 video_source_size 640,480
