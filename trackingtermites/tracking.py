@@ -25,7 +25,7 @@ class Termite:
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
         self.tracker = None
         self.colliding_with = []
-        self.path = [tuple([self.position[0], self.position[1], self.colliding_with])]
+        self.path = [tuple([int(self.position[0]), int(self.position[1]), self.colliding_with])]
 
     def detect_collisions(self, others):
         """Check if termite is colliding with others.
