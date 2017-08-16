@@ -80,6 +80,7 @@ class DataHandler:
         header = ''
         header += '# Date: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n'
         header += '# Movie name: ' + params['video_source'].split('/')[-1] + '\n'
+        header += '# Movie size: ' + str(params['video_source_size'][0]) + ', ' + str(params['video_source_size'][1]) + '\n'
 
         return header
 
