@@ -124,6 +124,11 @@ class Experiment:
             else:
                 if self.params['show_bounding_box']:
                     cv2.rectangle(frame, origin, end, termite.color)
+        if self.params['show_frame_info']:
+            cv2.putText(frame, f'#{int(self.video_source.get(cv2.CAP_PROP_POS_FRAMES))} of'
+                               f' {int(self.video_source.get(cv2.CAP_PROP_FRAME_COUNT))},'
+                               f' {int(self.video_source.get(cv2.CAP_PROP_FPS))}fps.',
+                       (10,10), cv2.FONT_HERSHEY_SIMPLEX, color=(0, 255, 255), fontScale=0.4)
 
     def track_all(self):
         """Start tracking loop.
@@ -133,7 +138,7 @@ class Experiment:
         Returns:
             None.
         """
-        fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
         video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
         ok = True
         while ok:

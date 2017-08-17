@@ -67,6 +67,13 @@ class DataHandler:
             else:
                 parameters['save_output'] = False
 
+        if 'show_frame_info' in parameters:
+            if parameters['show_frame_info'].lower() == 'true':
+                parameters['show_frame_info'] = True
+            else:
+                parameters['show_frame_info'] = False
+
+
         return parameters
 
     def write_output(self, params, termites):
