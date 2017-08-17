@@ -61,6 +61,12 @@ class DataHandler:
             else:
                 parameters['show_bounding_box'] = False
 
+        if 'save_output' in parameters:
+            if parameters['save_output'].lower() == 'true':
+                parameters['save_output'] = True
+            else:
+                parameters['save_output'] = False
+
         return parameters
 
     def write_output(self, params, termites):

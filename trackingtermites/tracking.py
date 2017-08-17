@@ -133,6 +133,8 @@ class Experiment:
         Returns:
             None.
         """
+        fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+        video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
         ok = True
         while ok:
             ok, frame = self.video_source.read()
@@ -142,6 +144,9 @@ class Experiment:
                 frame = cv2.resize(frame, self.params['video_source_size'])
                 self.update_termites(frame)
                 self.draw(frame)
+                if self.params['save_output']:
+                    video_output.write(frame)
+
                 cv2.imshow("Tracking", frame)
 
             k = cv2.waitKey(1) & 0xff
