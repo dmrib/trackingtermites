@@ -159,5 +159,5 @@ class Experiment:
 
 
 if __name__ == '__main__':
-    ex = Experiment('../data/sample_input.txt', '')
+    ex = Experiment('../data/sample_input.txt', '../data/')
     ex.track_all()

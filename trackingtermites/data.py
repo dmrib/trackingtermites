@@ -33,46 +33,23 @@ class DataHandler:
                     param, value = line.rstrip('\n').split(' ')
                     parameters[param] = value
 
-        if 'n_termites' in parameters:
-            parameters['n_termites'] = int(parameters['n_termites'])
-
-        if 'box_size' in parameters:
-            parameters['box_size'] = int(parameters['box_size'])
-
         if 'video_source_size' in parameters:
             y, x = parameters['video_source_size'].rstrip('\n').split(',')
             parameters['video_source_size'] = tuple([int(y), int(x)])
 
-        if 'show_labels' in parameters:
-            if parameters['show_labels'].lower() == 'true':
-                parameters['show_labels'] = True
-            else:
-                parameters['show_labels'] = False
+        integer_parameters = ['n_termites', 'box_size']
+        for parameter in integer_parameters:
+            parameters[parameter] = int(parameters[parameter])
 
-        if 'highlight_collisions' in parameters:
-            if parameters['highlight_collisions'].lower() == 'true':
-                parameters['highlight_collisions'] = True
-            else:
-                parameters['highlight_collisions'] = False
 
-        if 'show_bounding_box' in parameters:
-            if parameters['show_bounding_box'].lower() == 'true':
-                parameters['show_bounding_box'] = True
+        boolean_parameters = ['show_labels', 'highlight_collisions',
+                              'show_bounding_box', 'save_output',
+                              'show_frame_info']
+        for parameter in boolean_parameters:
+            if parameters[parameter].lower() == 'true':
+                parameters[parameter] = True
             else:
-                parameters['show_bounding_box'] = False
-
-        if 'save_output' in parameters:
-            if parameters['save_output'].lower() == 'true':
-                parameters['save_output'] = True
-            else:
-                parameters['save_output'] = False
-
-        if 'show_frame_info' in parameters:
-            if parameters['show_frame_info'].lower() == 'true':
-                parameters['show_frame_info'] = True
-            else:
-                parameters['show_frame_info'] = False
-
+                parameters[parameter] = False
 
         return parameters
 
@@ -87,7 +64,7 @@ class DataHandler:
         """
         header = self.create_header(params)
 
-        output_path = '../data/' + params['exp_name']
+        output_path = self.output_path + params['exp_name']
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
@@ -129,8 +106,3 @@ class DataHandler:
         header += '# Movie size: ' + str(params['video_source_size'][0]) + ', ' + str(params['video_source_size'][1]) + '\n'
 
         return header
-
-
-if __name__ == '__main__':
-    handler = DataHandler('../data/sample_input.txt', '')
-    handler.load_input()
