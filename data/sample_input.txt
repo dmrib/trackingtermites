@@ -13,7 +13,7 @@ n_termites 2
 method KCF
 
 # Bounding box initial size   ex.14
-box_size 17
+box_size 14
 
 # Video source redimensioning size  ex. 640,480
 video_source_size 640,480
