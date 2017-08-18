@@ -90,6 +90,37 @@ class Experiment:
             termite.tracker.init(frame, starting_box)
             self.termites.append(termite)
 
+        cv2.destroyWindow('ROI selector')
+
+    def track_all(self):
+        """Start tracking loop.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
+        ok, frame = self.video_source.read()
+        while ok:
+            frame = cv2.resize(frame, self.params['video_source_size'])
+            self.update_termites(frame)
+            self.draw(frame)
+            if self.params['save_output']:
+                video_output.write(frame)
+
+            cv2.imshow("Tracking", frame)
+
+            k = cv2.waitKey(1) & 0xff
+            if k == 27:
+                self.data_handler.write_output(self.params, self.termites)
+                break
+            elif k == ord('r'):
+                self.restart_trackers()
+            ok, frame = self.video_source.read()
+        self.data_handler.write_output(self.params, self.termites)
+
     def update_termites(self, frame):
         """Update termites positions.
 
@@ -130,32 +161,7 @@ class Experiment:
                                f' {int(self.video_source.get(cv2.CAP_PROP_FPS))}fps.',
                        (10,10), cv2.FONT_HERSHEY_SIMPLEX, color=(0, 255, 255), fontScale=0.4)
 
-    def track_all(self):
-        """Start tracking loop.
 
-        Args:
-            None.
-        Returns:
-            None.
-        """
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
-        ok, frame = self.video_source.read()
-        while ok:
-            frame = cv2.resize(frame, self.params['video_source_size'])
-            self.update_termites(frame)
-            self.draw(frame)
-            if self.params['save_output']:
-                video_output.write(frame)
-
-            cv2.imshow("Tracking", frame)
-
-            k = cv2.waitKey(1) & 0xff
-            if k == 27:
-                self.data_handler.write_output(self.params, self.termites)
-                break
-            ok, frame = self.video_source.read()
-        self.data_handler.write_output(self.params, self.termites)
 
 
 if __name__ == '__main__':
