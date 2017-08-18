@@ -140,28 +140,24 @@ class Experiment:
         """
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
-        ok = True
+        ok, frame = self.video_source.read()
         while ok:
-            ok, frame = self.video_source.read()
-            if not ok:
-                break
-            else:
-                frame = cv2.resize(frame, self.params['video_source_size'])
-                self.update_termites(frame)
-                self.draw(frame)
-                if self.params['save_output']:
-                    video_output.write(frame)
+            frame = cv2.resize(frame, self.params['video_source_size'])
+            self.update_termites(frame)
+            self.draw(frame)
+            if self.params['save_output']:
+                video_output.write(frame)
 
-                cv2.imshow("Tracking", frame)
+            cv2.imshow("Tracking", frame)
 
             k = cv2.waitKey(1) & 0xff
             if k == 27:
                 self.data_handler.write_output(self.params, self.termites)
                 break
-
+            ok, frame = self.video_source.read()
         self.data_handler.write_output(self.params, self.termites)
 
 
 if __name__ == '__main__':
-    ex = Experiment('../data/sample_input.txt', '')
+    ex = Experiment('../data/sample_input.txt', '../data/')
     ex.track_all()
