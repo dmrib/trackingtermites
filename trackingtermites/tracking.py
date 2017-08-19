@@ -117,6 +117,8 @@ class Experiment:
                 break
             elif k == ord('r'):
                 self.restart_trackers(frame)
+            elif k == ord('p'):
+                cv2.waitKey()
 
             ok, frame = self.video_source.read()
 
@@ -160,7 +162,7 @@ class Experiment:
             cv2.putText(frame, f'#{int(self.video_source.get(cv2.CAP_PROP_POS_FRAMES))} of'
                                f' {int(self.video_source.get(cv2.CAP_PROP_FRAME_COUNT))},'
                                f' {int(self.video_source.get(cv2.CAP_PROP_FPS))}fps.',
-                       (10,10), cv2.FONT_HERSHEY_SIMPLEX, color=(0, 255, 255), fontScale=0.4)
+                       (10,10), cv2.FONT_HERSHEY_SIMPLEX, color=(255, 0, 0), fontScale=0.3)
 
     def restart_trackers(self, frame):
         for termite in self.termites:
