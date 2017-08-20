@@ -37,7 +37,7 @@ class DataHandler:
             y, x = parameters['video_source_size'].rstrip('\n').split(',')
             parameters['video_source_size'] = tuple([int(y), int(x)])
 
-        integer_parameters = ['n_termites', 'box_size']
+        integer_parameters = ['n_termites', 'box_size', 'scale']
         for parameter in integer_parameters:
             parameters[parameter] = int(parameters[parameter])
 
@@ -77,7 +77,7 @@ class DataHandler:
                 out_file.write('###\n\n')
                 out_file.write('frame, y, x, colliding\n')
                 for frame, location in enumerate(termite.path):
-                    out_file.write(f'{frame}, {location[0]}, {location[1]}, {location[2]}\n')
+                    out_file.write(f'{frame}, {location[0]}, {location[1]}, {location[2]}, {location[3]}\n')
 
         summary_output = output_path + '/experiment_summary.dat'
         with open(summary_output, mode='w', encoding='utf-8') as summ_file:
