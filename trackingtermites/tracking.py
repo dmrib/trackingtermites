@@ -158,6 +158,10 @@ class Experiment:
             else:
                 if self.params['show_bounding_box']:
                     cv2.rectangle(frame, origin, end, termite.color)
+            if self.params['show_d_lines']:
+                for other_termite in self.termites:
+                    end = (int(other_termite.position[0]), int(other_termite.position[1]))
+                    cv2.line(frame, origin, end, color=termite.color, thickness=1)
         if self.params['show_frame_info']:
             cv2.putText(frame, f'#{int(self.video_source.get(cv2.CAP_PROP_POS_FRAMES))} of'
                                f' {int(self.video_source.get(cv2.CAP_PROP_FRAME_COUNT))},'
