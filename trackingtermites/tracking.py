@@ -118,7 +118,7 @@ class Experiment:
         Returns:
             None.
         """
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc(*'DIVX')
         video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
         ok, frame = self.video_source.read()
         while ok:
@@ -135,6 +135,8 @@ class Experiment:
                 break
             elif k == ord('r'):
                 self.restart_trackers(frame)
+            elif k == ord('e'):
+                self.restart_tracker(frame)
             elif k == ord('p'):
                 cv2.waitKey()
 
@@ -194,6 +196,15 @@ class Experiment:
             termite.tracker = cv2.Tracker_create(self.params['method'])
             termite.tracker.init(frame, new_region)
         cv2.destroyWindow('ROI selector')
+
+    def restart_tracker(self, frame):
+        termite_number = int(input('Tell me the termite number: ')) - 1
+        recover_point = cv2.selectROI(frame, False)
+        new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
+        self.termites[termite_number].tracker = cv2.Tracker_create(self.params['method'])
+        self.termites[termite_number].tracker.init(frame, new_region)
+        cv2.destroyWindow('ROI selector')
+
 
 if __name__ == '__main__':
     ex = Experiment('../data/sample_input.txt', '../data/')
