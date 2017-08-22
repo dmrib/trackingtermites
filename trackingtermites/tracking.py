@@ -23,7 +23,17 @@ class Experiment:
         self.data_handler = data.DataHandler(input_path, output_path)
         self.params = self.data_handler.load_input()
         self.video_source = cv2.VideoCapture(self.params['video_source'])
+
+    def run(self):
+        """Start experiment.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
         self.locate_termites()
+        self.track_all()
 
     def locate_termites(self):
         """Open GUI tool for selecting termite to be tracked.
@@ -151,4 +161,4 @@ class Experiment:
 
 if __name__ == '__main__':
     ex = Experiment('../data/sample_input.txt', '../data/')
-    ex.track_all()
+    ex.run()
