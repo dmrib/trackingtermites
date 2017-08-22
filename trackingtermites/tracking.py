@@ -1,11 +1,10 @@
 """This module contains the termite tracking functionalities."""
 
-import math
 import sys
-import random
 import cv2
 
 import data
+import termites as trmt
 
 
 class Experiment:
@@ -47,7 +46,7 @@ class Experiment:
         for t_number in range(self.params['n_termites']):
             starting_point = cv2.selectROI(frame, False)
             starting_box = (starting_point[0], starting_point[1], self.params['box_size'], self.params['box_size'])
-            termite = Termite(t_number+1, starting_point, self.params['box_size'])
+            termite = trmt.Termite(t_number+1, starting_point, self.params['box_size'])
             termite.tracker = cv2.Tracker_create(self.params['method'])
             termite.tracker.init(frame, starting_box)
             self.termites.append(termite)

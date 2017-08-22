@@ -1,5 +1,10 @@
 """This module contains abstractions for dealing with termites."""
 
+import random
+import math
+import math
+
+
 class Termite:
     """Termite under study abstraction."""
     def __init__(self, identity, starting_point, box_size=20):
