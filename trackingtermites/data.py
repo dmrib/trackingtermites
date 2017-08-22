@@ -75,7 +75,7 @@ class DataHandler:
                 out_file.write(f'# Termite number: {termite.identity}\n')
                 out_file.write(f'# Color: {termite.color}\n\n')
                 out_file.write('###\n\n')
-                out_file.write('frame, y, x, colliding\n')
+                out_file.write('frame, y, x, colliding, distances\n')
                 for frame, location in enumerate(termite.path):
                     out_file.write(f'{frame}, {location[0]}, {location[1]}, {location[2]}, {location[3]}\n')
 
