@@ -21,6 +21,8 @@ class Experiment:
         self.termites = []
         self.params = data.load_input('../data/sample_input.txt')
         self.video_source = cv2.VideoCapture(self.params['video_source'])
+        self.current_frame = None
+        self.video_playing = False
 
     def run(self):
         """Start experiment.
@@ -45,11 +47,11 @@ class Experiment:
             print('Could not open video.')
             sys.exit()
 
-        ok, frame = self.video_source.read()
-        if not ok:
+        self.video_playing, self.current_frame = self.video_source.read()
+        if not self.video_playing:
             print('Could not read video file.')
             sys.exit()
-        frame = cv2.resize(frame, self.params['video_source_size'])
+        frame = cv2.resize(self.current_frame, self.params['video_source_size'])
 
         for t_number in range(self.params['n_termites']):
             starting_point = cv2.selectROI(frame, False)
@@ -71,9 +73,8 @@ class Experiment:
         """
         fourcc = cv2.VideoWriter_fourcc(*'DIVX')
         video_output = cv2.VideoWriter('../data/out-video.avi', fourcc, 30.0, (640,480))
-        ok, frame = self.video_source.read()
-        while ok:
-            frame = cv2.resize(frame, self.params['video_source_size'])
+        while self.video_playing:
+            frame = cv2.resize(self.current_frame, self.params['video_source_size'])
             self.update_termites(frame)
             self.draw(frame)
             if self.params['save_output']:
@@ -91,7 +92,7 @@ class Experiment:
             elif k == ord('p'):
                 cv2.waitKey()
 
-            ok, frame = self.video_source.read()
+            self.video_playing, self.current_frame = self.video_source.read()
 
         data.write_output(self.params['output_path'], self.params, self.termites)
 
@@ -122,17 +123,21 @@ class Experiment:
             origin = (int(termite.position[0]), int(termite.position[1]))
             end = (int(termite.position[0] + termite.position[2]),
                   int(termite.position[1] + termite.position[3]))
+
             if self.params['show_labels']:
                 cv2.putText(frame, str(termite.identity), (end[0]+5,end[1]+5), cv2.FONT_HERSHEY_SIMPLEX, color=termite.color, fontScale=0.3)
+
             if termite.colliding_with and self.params['highlight_collisions']:
                     cv2.rectangle(frame, origin, end, termite.color, 5)
             else:
                 if self.params['show_bounding_box']:
                     cv2.rectangle(frame, origin, end, termite.color)
+
             if self.params['show_d_lines']:
                 for other_termite in self.termites:
                     end = (int(other_termite.position[0]), int(other_termite.position[1]))
                     cv2.line(frame, origin, end, color=termite.color, thickness=1)
+
         if self.params['show_frame_info']:
             cv2.putText(frame, f'#{int(self.video_source.get(cv2.CAP_PROP_POS_FRAMES))} of'
                                f' {int(self.video_source.get(cv2.CAP_PROP_FRAME_COUNT))},'
