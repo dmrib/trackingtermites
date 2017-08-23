@@ -17,7 +17,6 @@ class Experiment:
             output_path (str): path for output file.
         Returns:
             None.
-
         """
         self.termites = []
         self.data_handler = data.DataHandler(input_path, output_path)

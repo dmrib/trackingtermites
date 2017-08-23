@@ -54,8 +54,8 @@ class Termite:
         """
         distances = []
         for other in others:
-            a = math.pow(int((self.position[0] - other.position[0])),2)
-            b = math.pow(int((self.position[1] - other.position[1])),2)
-            distance = round(math.sqrt(a + b) / scale, 2)
+            origin = math.pow(int((self.position[0] - other.position[0])),2)
+            destination = math.pow(int((self.position[1] - other.position[1])),2)
+            distance = round(math.sqrt(origin + destination) / scale, 2)
             distances.append(distance)
         self.distances = distances
