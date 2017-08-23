@@ -9,7 +9,7 @@ import termites as trmt
 
 class Experiment:
     """Tracking experiment abstraction."""
-    def __init__(self, input_path, output_path):
+    def __init__(self, input_path):
         """Initializer.
 
         Args:
@@ -19,8 +19,7 @@ class Experiment:
             None.
         """
         self.termites = []
-        self.data_handler = data.DataHandler(input_path, output_path)
-        self.params = self.data_handler.load_input()
+        self.params = data.load_input('../data/sample_input.txt')
         self.video_source = cv2.VideoCapture(self.params['video_source'])
 
     def run(self):
@@ -83,7 +82,7 @@ class Experiment:
 
             k = cv2.waitKey(1) & 0xff
             if k == 27:
-                self.data_handler.write_output(self.params, self.termites)
+                data.write_output(self.params['output_path'], self.params, self.termites)
                 break
             elif k == ord('r'):
                 self.restart_trackers(frame)
@@ -94,7 +93,7 @@ class Experiment:
 
             ok, frame = self.video_source.read()
 
-        self.data_handler.write_output(self.params, self.termites)
+        data.write_output(self.params['output_path'], self.params, self.termites)
 
     def update_termites(self, frame):
         """Update termites positions.
@@ -172,5 +171,5 @@ class Experiment:
 
 
 if __name__ == '__main__':
-    ex = Experiment('../data/sample_input.txt', '../data/')
+    ex = Experiment('../data/sample_input.txt')
     ex.run()
