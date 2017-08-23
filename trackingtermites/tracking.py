@@ -117,7 +117,6 @@ class Experiment:
 
         Args:
             frame (numpy.ndarray): next video frame.
-
         Returns:
             None.
         """
@@ -143,6 +142,13 @@ class Experiment:
                        (10,10), cv2.FONT_HERSHEY_SIMPLEX, color=(255, 0, 0), fontScale=0.3)
 
     def restart_trackers(self, frame):
+        """Restart the tracker instance of every termite in experiment.
+
+        Args:
+            frame (np.ndarray): video frame.
+        Returns:
+            None.
+        """
         for termite in self.termites:
             recover_point = cv2.selectROI(frame, False)
             new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
@@ -151,6 +157,13 @@ class Experiment:
         cv2.destroyWindow('ROI selector')
 
     def restart_tracker(self, frame):
+        """Restart the tracker for a single individual.
+
+        Args:
+            frame (np.ndarray): video frame.
+        Returns:
+            None.
+        """
         termite_number = int(input('Tell me the termite number: ')) - 1
         recover_point = cv2.selectROI(frame, False)
         new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
