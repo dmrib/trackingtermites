@@ -29,8 +29,8 @@ def load_input(input_path):
 
 
     boolean_parameters = ['show_labels', 'highlight_collisions',
-                          'show_bounding_box', 'save_output',
-                          'show_frame_info', 'show_d_lines']
+                          'show_bounding_box', 'show_frame_info',
+                          'show_d_lines']
     for parameter in boolean_parameters:
         if parameters[parameter].lower() == 'true':
             parameters[parameter] = True

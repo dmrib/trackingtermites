@@ -3,8 +3,6 @@
 import random
 import math
 
-import cv2
-
 
 class Termite:
     """Termite under study abstraction."""
@@ -26,6 +24,17 @@ class Termite:
         self.colliding_with = []
         self.distances = []
         self.path = [tuple([int(self.position[0]), int(self.position[1]), self.colliding_with, self.distances])]
+
+    @property
+    def origin(self):
+        """Termite bounding box origin point."""
+        return (int(self.position[0]), int(self.position[1]))
+
+    @property
+    def end(self):
+        """Termite bounding box end point."""
+        return (int(self.position[0] + self.position[2]),
+                int(self.position[1] + self.position[3]))
 
     def detect_collisions(self, others):
         """Check if termite is colliding with others.
@@ -60,18 +69,3 @@ class Termite:
             distance = round(math.sqrt(origin + destination) / scale, 2)
             distances.append(distance)
         self.distances = distances
-
-    def restart_tracker(self, frame, box_size, method):
-        """Restart termite tracker based on given frame.
-
-        Args:
-            frame (np.ndarray): reference frame.
-            box_size (int): bounding box size.
-        Returns:
-            None.
-        """
-        recover_point = cv2.selectROI(frame, False)
-        new_region = (recover_point[0], recover_point[1], box_size, box_size)
-        self.tracker = cv2.Tracker_create(method)
-        self.tracker.init(frame, new_region)
-        cv2.destroyWindow('ROI selector')
