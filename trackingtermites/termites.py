@@ -23,7 +23,7 @@ class Termite:
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
         self.tracker = None
         self.colliding_with = []
-        self.distances = []        
+        self.distances = []
         self.path = [tuple([int(self.position[0]), int(self.position[1]), self.colliding_with, self.distances])]
 
     def detect_collisions(self, others):
@@ -59,3 +59,17 @@ class Termite:
             distance = round(math.sqrt(origin + destination) / scale, 2)
             distances.append(distance)
         self.distances = distances
+
+    def restart_tracker(self, frame):
+        """Restart termite tracker based on given frame.
+
+        Args:
+            frame (np.ndarray): reference frame.
+        Returns:
+            None.
+        """
+        recover_point = cv2.selectROI(frame, False)
+        new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
+        self.tracker = cv2.Tracker_create(self.params['method'])
+        self.tracker.init(frame, new_region)
+        cv2.destroyWindow('ROI selector')

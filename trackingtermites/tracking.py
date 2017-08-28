@@ -144,35 +144,21 @@ class Experiment:
                                f' {int(self.video_source.get(cv2.CAP_PROP_FPS))}fps.',
                        (10,10), cv2.FONT_HERSHEY_SIMPLEX, color=(255, 0, 0), fontScale=0.3)
 
-    def restart_trackers(self, frame):
+    def restart_trackers(self, frame, restart_all=False):
         """Restart the tracker instance of every termite in experiment.
 
         Args:
             frame (np.ndarray): video frame.
+            restart_all (bool): should restart every termite or a specific one.
         Returns:
             None.
         """
-        for termite in self.termites:
-            recover_point = cv2.selectROI(frame, False)
-            new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
-            termite.tracker = cv2.Tracker_create(self.params['method'])
-            termite.tracker.init(frame, new_region)
-        cv2.destroyWindow('ROI selector')
-
-    def restart_tracker(self, frame):
-        """Restart the tracker for a single individual.
-
-        Args:
-            frame (np.ndarray): video frame.
-        Returns:
-            None.
-        """
-        termite_number = int(input('Tell me the termite number: ')) - 1
-        recover_point = cv2.selectROI(frame, False)
-        new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
-        self.termites[termite_number].tracker = cv2.Tracker_create(self.params['method'])
-        self.termites[termite_number].tracker.init(frame, new_region)
-        cv2.destroyWindow('ROI selector')
+        if restart_all:
+            for termite in self.termites:
+                termite.restart_tracker(frame)
+        else:
+            termite_number = int(input('Tell me the termite number: ')) - 1
+            self.termites[termite_number].restart_tracker()
 
 
 if __name__ == '__main__':
