@@ -2,7 +2,8 @@
 
 import random
 import math
-import math
+
+import cv2
 
 
 class Termite:
@@ -60,16 +61,17 @@ class Termite:
             distances.append(distance)
         self.distances = distances
 
-    def restart_tracker(self, frame):
+    def restart_tracker(self, frame, box_size, method):
         """Restart termite tracker based on given frame.
 
         Args:
             frame (np.ndarray): reference frame.
+            box_size (int): bounding box size.
         Returns:
             None.
         """
         recover_point = cv2.selectROI(frame, False)
-        new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
-        self.tracker = cv2.Tracker_create(self.params['method'])
+        new_region = (recover_point[0], recover_point[1], box_size, box_size)
+        self.tracker = cv2.Tracker_create(method)
         self.tracker.init(frame, new_region)
         cv2.destroyWindow('ROI selector')

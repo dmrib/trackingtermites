@@ -86,9 +86,9 @@ class Experiment:
                 data.write_output(self.params['output_path'], self.params, self.termites)
                 break
             elif k == ord('r'):
-                self.restart_trackers(frame)
+                self.restart_trackers(frame, restart_all=True)
             elif k == ord('e'):
-                self.restart_tracker(frame)
+                self.restart_trackers(frame)
             elif k == ord('p'):
                 cv2.waitKey()
 
@@ -155,10 +155,10 @@ class Experiment:
         """
         if restart_all:
             for termite in self.termites:
-                termite.restart_tracker(frame)
+                termite.restart_tracker(frame, box_size=self.params['box_size'], method=self.params['method'])
         else:
             termite_number = int(input('Tell me the termite number: ')) - 1
-            self.termites[termite_number].restart_tracker()
+            self.termites[termite_number].restart_tracker(frame, box_size=self.params['box_size'], method=self.params['method'])
 
 
 if __name__ == '__main__':
