@@ -4,19 +4,19 @@
 exp_name traj-00146-2017-05-08-KRR-N02-16-indiv
 
 # Video source file path relative to script location
-video_source ../data/00146.MTS
+video_source E:\TrackingTermites\N02HHS2017Series\N02HHS2017-V1.mp4
 
 # Video pixel to cm scale
 scale 50
 
 # Number of termites to be tracked   ex. 1, 2, 4, 8, 16
-n_termites 16
+n_termites 1
 
 # Tracking method   ex. MIL, KCF, MEDIANFLOW, TLD
 method KCF
 
 # Bounding box initial size   ex.14
-box_size 12
+box_size 28
 
 # Video source redimensioning size  ex. 720,680
 video_source_size 640,480
@@ -38,3 +38,6 @@ show_d_lines False
 
 # Save output video   ex. True, False
 save_output True
+
+# Output video path
+output_path E:/
