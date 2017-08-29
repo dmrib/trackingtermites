@@ -1,10 +1,10 @@
 ### Sample input file for tracking algorithm
 
 # Experiment name
-exp_name traj-00146-2017-05-08-KRR-N02-16-indiv
+exp_name development
 
 # Video source file path relative to script location
-video_source E:\TrackingTermites\N02HHS2017Series\N02HHS2017-V1.mp4
+video_source E:/C0001.mp4
 
 # Video pixel to cm scale
 scale 50
@@ -16,7 +16,7 @@ n_termites 1
 method KCF
 
 # Bounding box initial size   ex.14
-box_size 28
+box_size 25
 
 # Video source redimensioning size  ex. 720,680
 video_source_size 640,480
@@ -31,13 +31,13 @@ show_bounding_box True
 show_labels True
 
 # Highlight collisions   ex. True, False
-highlight_collisions False
+highlight_collisions True
 
 # Show distance lines   ex. True, False
-show_d_lines False
+show_d_lines True
 
 # Save output video   ex. True, False
 save_output True
 
-# Output video path
-output_path E:/
+# Output path
+output_path ../data/
