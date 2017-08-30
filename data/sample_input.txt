@@ -4,13 +4,16 @@
 exp_name development
 
 # Video source file path relative to script location
-video_source E:/C0001.mp4
+video_source ../data/00012.MTS
 
 # Video pixel to cm scale
 scale 50
 
 # Number of termites to be tracked   ex. 1, 2, 4, 8, 16
 n_termites 1
+
+# Video input filters
+filters b-filtering
 
 # Tracking method   ex. MIL, KCF, MEDIANFLOW, TLD
 method KCF

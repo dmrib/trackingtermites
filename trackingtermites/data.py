@@ -23,6 +23,12 @@ def load_input(input_path):
         y, x = parameters['video_source_size'].rstrip('\n').split(',')
         parameters['video_source_size'] = tuple([int(y), int(x)])
 
+    if 'filters' in parameters:
+        filters = []
+        for filtr in parameters['filters'].rstrip('\n').split(','):
+            filters.append(filtr)
+        parameters['filters'] = filters
+
     integer_parameters = ['n_termites', 'box_size', 'scale']
     for parameter in integer_parameters:
         parameters[parameter] = int(parameters[parameter])

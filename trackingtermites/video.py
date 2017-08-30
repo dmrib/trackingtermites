@@ -6,11 +6,13 @@ import cv2
 
 class VideoPlayer:
     """An image sequence manipulation abstraction."""
-    def __init__(self, source_path, default_size, info=True):
+    def __init__(self, source_path, default_size, filters, info=True):
         """Initializer.
 
         Args:
             source_path (str): path to video source.
+            default_size (tuple): default size for frame redimensioning.
+            filters (list): list of filters to apply in video source.
             info (bool): should write frame info.
         Returns:
             None.
@@ -23,6 +25,7 @@ class VideoPlayer:
         self.current_frame = None
         self.playing = False
         self.default_size = default_size
+        self.filters = filters
         self.info = info
         self.start()
 
@@ -49,13 +52,30 @@ class VideoPlayer:
             frame (np.ndarray): next frame.
         """
         self.playing, frame = self.source.read()
-        self.current_frame = cv2.resize(frame, self.default_size)
+        self.current_frame = self.apply_filters(cv2.resize(frame, self.default_size))
 
         if self.info:
             cv2.putText(self.current_frame, f'#{int(self.source.get(cv2.CAP_PROP_POS_FRAMES))} of'
-                               f' {int(self.source.get(cv2.CAP_PROP_FRAME_COUNT))},'
-                               f' {int(self.source.get(cv2.CAP_PROP_FPS))}fps.',
-                       (10,10), 7, color=(0, 0, 0), fontScale=0.3)
+                        f' {int(self.source.get(cv2.CAP_PROP_FRAME_COUNT))},'
+                        f' {int(self.source.get(cv2.CAP_PROP_FPS))}fps.',
+                        (10,10), 7, color=(0, 0, 0), fontScale=0.3)
+
+    def apply_filters(self, frame):
+        """Apply specified filters to frame.
+
+        Args:
+            frame (np.ndarray): frame to be modified.
+        Returns:
+            n_frame (np.ndarray): modified frame.
+        """
+        n_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        if 'g-blur' in self.filters:
+            n_frame = cv2.GaussianBlur(n_frame, (5,5), 0)
+        if 'b-filtering' in self.filters:
+            n_frame = cv2.bilateralFilter(n_frame, 9, 75, 75)
+        n_frame = cv2.cvtColor(n_frame, cv2.COLOR_GRAY2BGR)
+
+        return n_frame
 
     def pause(self):
         """Pauses image sequence.
