@@ -73,6 +73,8 @@ class VideoPlayer:
             n_frame = cv2.GaussianBlur(n_frame, (5,5), 0)
         if 'b-filtering' in self.filters:
             n_frame = cv2.bilateralFilter(n_frame, 9, 75, 75)
+        if 'canny' in self.filters:
+            n_frame = cv2.Canny(n_frame, 100, 200)
         n_frame = cv2.cvtColor(n_frame, cv2.COLOR_GRAY2BGR)
 
         return n_frame
