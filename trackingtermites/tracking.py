@@ -223,10 +223,12 @@ class GeneralTracker:
             header (str): experiment header.
         """
         header = ''
-        header += '# Date: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n'
-        header += '# Movie name: ' + self.params['video_source'].split('/')[-1] + '\n'
-        header += '# Movie size: ' + str(self.params['video_source_size'][0]) + ', ' + str(self.params['video_source_size'][1]) + '\n'
-
+        header += '# Date: {}\n'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        header += '# Movie name: {}\n'.format(self.params['video_source'].split('/')[-1])
+        header += '# Movie size: {}, {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
+        header += '# Filters: {}\n'.format(self.params['filters'])
+        header += '# Bounding box size: {}\n'.format(self.params['box_size'])
+        
         return header
 
     def create_summary(self):
