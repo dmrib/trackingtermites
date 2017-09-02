@@ -21,9 +21,9 @@ class Termite:
         self.box_size = box_size
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
         self.tracker = None
-        self.colliding_with = []
+        self.encountering_with = []
         self.distances = []
-        self.path = [tuple([int(self.position[0]), int(self.position[1]), self.colliding_with, self.distances])]
+        self.path = [tuple([int(self.position[0]), int(self.position[1]), self.encountering_with, self.distances])]
 
     @property
     def origin(self):
@@ -36,23 +36,23 @@ class Termite:
         return (int(self.position[0] + self.position[2]),
                 int(self.position[1] + self.position[3]))
 
-    def detect_collisions(self, others):
-        """Check if termite is colliding with others.
+    def detect_encounters(self, others):
+        """Check if termite is encountering with others.
 
         Args:
             others (list): termites to be compared.
         Returns:
             None.
         """
-        colliding_with = []
+        encountering_with = []
         for other in others:
             if other.identity != self.identity:
                 if (self.position[1] < other.position[1] + self.box_size and
                     self.position[1] + self.box_size > other.position[1] and
                     self.position[0] < other.position[0] + self.box_size and
                     self.box_size + self.position[0] > other.position[0]):
-                    colliding_with.append(other.identity)
-        self.colliding_with = colliding_with
+                    encountering_with.append(other.identity)
+        self.encountering_with = encountering_with
 
     def compute_distances(self, others, scale):
         """Compute the distace between the termite and the other samples.

@@ -21,7 +21,7 @@ class GeneralTracker:
             None.
         """
         self.termites = []
-        self.params = data.load_input('../data/sample_input.txt')
+        self.params = self.read_input(input_path)
         self.video_source = video.VideoPlayer(self.params['video_source'],
                             self.params['video_source_size'], self.params['filters'])
 
@@ -95,9 +95,9 @@ class GeneralTracker:
             if not found:
                 print(f'Lost termite no.{termite.identity}')
                 self.video_source.pause()
-            termite.detect_collisions(self.termites)
+            termite.detect_encounters(self.termites)
             termite.compute_distances(self.termites, self.params['scale'])
-            termite.path.append([int(termite.position[0]), int(termite.position[1]), termite.colliding_with, termite.distances])
+            termite.path.append([int(termite.position[0]), int(termite.position[1]), termite.encountering_with, termite.distances])
 
     def draw(self):
         """Draw bounding box in the tracked termites.
@@ -110,7 +110,7 @@ class GeneralTracker:
         for termite in self.termites:
             if self.params['show_labels']:
                 self.video_source.draw_label(str(termite.identity), termite.color, (termite.end[0]+5, termite.end[1]+5))
-            if termite.colliding_with and self.params['highlight_collisions']:
+            if termite.encountering_with and self.params['highlight_collisions']:
                     self.video_source.draw_b_box(termite.origin, termite.end, termite.color, strong=True)
             else:
                 if self.params['show_bounding_box']:
@@ -147,6 +147,47 @@ class GeneralTracker:
         new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
         termite.tracker = cv2.Tracker_create(self.params['method'])
         termite.tracker.init(self.video_source.current_frame, new_region)
+
+    def read_input(self, input_path):
+        """Read input file and creates parameters dictionary.
+
+        Args:
+            input_path (str): path to input file.
+        Returns:
+            parameters (dict): experiment parameters.
+        """
+        parameters = {}
+        with open(input_path, mode='r', encoding='utf-8') as input_file:
+            for line in input_file:
+                if not line[0] == '\n' and not line[0] == '#' and not line[0] == ' ':
+                    param, value = line.rstrip('\n').split(' ')
+                    parameters[param] = value
+
+        if 'video_source_size' in parameters:
+            y, x = parameters['video_source_size'].rstrip('\n').split(',')
+            parameters['video_source_size'] = tuple([int(y), int(x)])
+
+        if 'filters' in parameters:
+            filters = []
+            for filtr in parameters['filters'].rstrip('\n').split(','):
+                filters.append(filtr)
+            parameters['filters'] = filters
+
+        integer_parameters = ['n_termites', 'box_size', 'scale']
+        for parameter in integer_parameters:
+            parameters[parameter] = int(parameters[parameter])
+
+
+        boolean_parameters = ['show_labels', 'highlight_collisions',
+                              'show_bounding_box', 'show_frame_info',
+                              'show_d_lines']
+        for parameter in boolean_parameters:
+            if parameters[parameter].lower() == 'true':
+                parameters[parameter] = True
+            else:
+                parameters[parameter] = False
+
+        return parameters
 
     def write_output(self):
         """Write output data to file.
