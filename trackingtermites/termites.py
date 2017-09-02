@@ -69,3 +69,21 @@ class Termite:
             distance = round(math.sqrt(origin + destination) / scale, 2)
             distances.append(distance)
         self.distances = distances
+
+    def generate_output(self):
+        """Create output string for a termite.
+
+        Args:
+            None.
+        Returns:
+            output (str): output string.
+        """
+        output = ''
+        output += '# Termite number: {}\n'.format(self.identity)
+        output += '# Color: {}\n\n'.format(self.color)
+        output += ('###\n\n')
+        output += ('frame, y, x, colliding, distances\n')
+        for frame, location in enumerate(self.path):
+            output += '{}, {}, {}, {}, {}\n'.format(frame, location[0], location[1], location[2], location[3])
+
+        return output

@@ -1,7 +1,9 @@
 """This module contains the termite tracking functionalities."""
 
-import sys
+import datetime
 import cv2
+import os
+import sys
 
 import data
 import video
@@ -68,7 +70,6 @@ class GeneralTracker:
 
             pressed_key = cv2.waitKey(1) & 0xff    # Continue if no key is being pressed
             if pressed_key == 27:
-                data.write_output(self.params['output_path'], self.params, self.termites)
                 break
             elif pressed_key == ord('r'):
                 self.restart_trackers(full=True)
@@ -79,7 +80,7 @@ class GeneralTracker:
 
             self.video_source.next_frame()
 
-        data.write_output(self.params['output_path'], self.params, self.termites)
+        self.write_output()
 
     def update_termites(self):
         """Update termites positions.
@@ -146,6 +147,68 @@ class GeneralTracker:
         new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
         termite.tracker = cv2.Tracker_create(self.params['method'])
         termite.tracker.init(self.video_source.current_frame, new_region)
+
+    def write_output(self):
+        """Write output data to file.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        header = self.create_header()
+
+        output_path = self.params['output_path'] + self.params['exp_name']
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        summary_output = output_path + '/experiment_summary.dat'
+        with open(summary_output, mode='w', encoding='utf-8') as summ_file:
+            summ_file.write(self.create_summary())
+
+        for termite in self.termites:
+            termite_output = output_path + '/termite-{}.dat'.format(termite.identity)
+            with open(termite_output, mode='w', encoding='utf-8') as out_file:
+                out_file.write(header)
+                out_file.write(termite.generate_output())
+
+    def create_header(self):
+        """Creates header string of an experiment.
+
+        Args:
+            None.
+        Returns:
+            header (str): experiment header.
+        """
+        header = ''
+        header += '# Date: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n'
+        header += '# Movie name: ' + self.params['video_source'].split('/')[-1] + '\n'
+        header += '# Movie size: ' + str(self.params['video_source_size'][0]) + ', ' + str(self.params['video_source_size'][1]) + '\n'
+
+        return header
+
+    def create_summary(self):
+        """Creates summary description of an experiment encounters.
+
+        Args:
+            None.
+        Returns:
+            summary (str): experiment encounters summary.
+        """
+        header = self.create_header()
+        summary = ''
+        summary += '# Experiment summary\n'
+        summary += header
+        summary += '\n\n###\n\n'
+        for step in range(len(self.termites[0].path)):
+            for termite in self.termites:
+                if not termite.path[step][2]:
+                    summary += '{}, {}, {}, {}, 0\n'.format(step, termite.path[step][0], termite.path[step][1], termite.identity)
+                else:
+                    for encounter in termite.path[step][2]:
+                        summary += '{}, {}, {}, {}, {}\n'.format(step, termite.path[step][0], termite.path[step][1], termite.identity, encounter)
+
+        return summary
 
 
 if __name__ == '__main__':
