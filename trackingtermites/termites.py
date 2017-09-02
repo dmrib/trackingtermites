@@ -21,9 +21,7 @@ class Termite:
         self.box_size = box_size
         self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
         self.tracker = None
-        self.encountering_with = []
-        self.distances = []
-        self.path = [tuple([int(self.position[0]), int(self.position[1]), self.encountering_with, self.distances])]
+        self.path = []
 
     @property
     def origin(self):

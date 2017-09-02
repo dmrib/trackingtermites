@@ -53,6 +53,7 @@ class GeneralTracker:
             termite.tracker.init(self.video_source.current_frame, starting_box)
 
             self.termites.append(termite)
+        self.update_termites()
 
     def track_all(self):
         """Start tracking loop.
