@@ -156,8 +156,3 @@ class VideoPlayer:
         ROI = cv2.selectROI(self.current_frame, False)
         cv2.destroyWindow('ROI selector')
         return ROI
-
-
-if __name__ == '__main__':
-    vp = VideoPlayer('E:/C0001.mp4', (640,480))
-    print(vp.select_roi())
