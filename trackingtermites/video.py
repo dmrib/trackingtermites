@@ -55,9 +55,8 @@ class VideoPlayer:
         self.current_frame = self.apply_filters(cv2.resize(frame, self.default_size))
 
         if self.info:
-            cv2.putText(self.current_frame, f'#{int(self.source.get(cv2.CAP_PROP_POS_FRAMES))} of'
-                        f' {int(self.source.get(cv2.CAP_PROP_FRAME_COUNT))},'
-                        f' {int(self.source.get(cv2.CAP_PROP_FPS))}fps.',
+            cv2.putText(self.current_frame, '#{} of {}, {}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
+                        self.source.get(cv2.CAP_PROP_FRAME_COUNT), self.source.get(cv2.CAP_PROP_FPS)),
                         (10,10), 7, color=(0, 0, 0), fontScale=0.3)
 
     def apply_filters(self, frame):

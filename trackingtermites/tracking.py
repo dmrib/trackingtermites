@@ -5,7 +5,6 @@ import cv2
 import os
 import sys
 
-import data
 import video
 import termites as trmt
 
@@ -94,7 +93,7 @@ class GeneralTracker:
         for termite in self.termites:
             found, termite.position = termite.tracker.update(self.video_source.current_frame)
             if not found:
-                print(f'Lost termite no.{termite.identity}')
+                print('Lost termite no.{}'.format(termite.identity))
                 self.video_source.pause()
             termite.detect_encounters(self.termites)
             termite.compute_distances(self.termites, self.params['scale'])
@@ -228,7 +227,7 @@ class GeneralTracker:
         header += '# Movie size: {}, {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
         header += '# Filters: {}\n'.format(self.params['filters'])
         header += '# Bounding box size: {}\n'.format(self.params['box_size'])
-        
+
         return header
 
     def create_summary(self):
