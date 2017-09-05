@@ -4,7 +4,7 @@
 exp_name development
 
 # Video source file path relative to script location
-video_source ../data/00012.MTS
+video_source ../data/SAM_0056.MP4
 
 # Video pixel to cm scale
 scale 50
@@ -12,14 +12,14 @@ scale 50
 # Number of termites to be tracked   ex. 1, 2, 4, 8, 16
 n_termites 1
 
-# Video input filters
-filters b-filtering
+# Video input filters ex. g-blur, b-filtering, canny, t_adaptive, otsu
+filters None
 
-# Tracking method   ex. MIL, KCF, MEDIANFLOW, TLD
+# Tracking method   ex. MIL, KCF, MEDIANFLOW, TLD, BOOSTING, GOTURN
 method KCF
 
 # Bounding box initial size   ex.14
-box_size 25
+box_size 30
 
 # Video source redimensioning size  ex. 720,680
 video_source_size 640,480
