@@ -152,6 +152,30 @@ class VideoPlayer:
         Returns:
             ROI (tuple): selected ROI coordinates.
         """
-        ROI = cv2.selectROI(self.current_frame, False)
+        ROI = cv2.selectROI('Select region of interest...', self.current_frame, False, False)
         cv2.destroyWindow('ROI selector')
         return ROI
+
+    def crop_roi(self, output_path, label, n_frames):
+        """Prompt user for a region of interest and crop it from video frames
+           saving in output path.
+
+        Args:
+            output_path (str): path for image files.
+            label (str): image label to be inserted in output path.
+        Returns:
+            None.
+        """
+        roi = self.select_roi()
+        roi = [int(coordinate) for coordinate in roi]
+        frames_croped = 1
+        while frames_croped <= n_frames:
+            croped_image = self.current_frame[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
+            cv2.imwrite(output_path+label+str(frames_croped)+'.jpg', croped_image)
+            frames_croped += 1
+
+
+
+if __name__ == '__main__':
+    vd = VideoPlayer('../data/00003.MTS', (640, 480), ['None'], info=True)
+    vd.crop_roi('../data','worker',3)
