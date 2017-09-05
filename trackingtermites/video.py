@@ -52,7 +52,9 @@ class VideoPlayer:
             frame (np.ndarray): next frame.
         """
         self.playing, frame = self.source.read()
-        self.current_frame = self.apply_filters(cv2.resize(frame, self.default_size))
+        self.current_frame = cv2.resize(frame, self.default_size)
+        if self.filters:
+            self.current_frame = self.apply_filters(self.current_frame)
 
         if self.info:
             cv2.putText(self.current_frame, '#{} of {}, {}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
@@ -171,11 +173,12 @@ class VideoPlayer:
         frames_croped = 1
         while frames_croped <= n_frames:
             croped_image = self.current_frame[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
-            cv2.imwrite(output_path+label+str(frames_croped)+'.jpg', croped_image)
+            destination_path = output_path + label + str(frames_croped) + '.jpg'
+            cv2.imwrite(destination_path, croped_image)
+            self.next_frame()
             frames_croped += 1
 
 
-
 if __name__ == '__main__':
-    vd = VideoPlayer('../data/00003.MTS', (640, 480), ['None'], info=True)
-    vd.crop_roi('../data','worker',3)
+    vd = VideoPlayer('../data/SAM_0056.MP4', (640, 480), [], info=True)
+    vd.crop_roi('../data/development/', 'worker', 3)
