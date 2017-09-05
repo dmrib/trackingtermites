@@ -170,7 +170,8 @@ class GeneralTracker:
         if 'filters' in parameters:
             filters = []
             for filtr in parameters['filters'].rstrip('\n').split(','):
-                filters.append(filtr)
+                if filtr != 'None':
+                    filters.append(filtr)
             parameters['filters'] = filters
 
         integer_parameters = ['n_termites', 'box_size', 'scale']
