@@ -175,6 +175,7 @@ class VideoPlayer:
         roi = [int(coordinate) for coordinate in roi]
         frames_croped = 1
         while frames_croped <= n_frames:
+            print('Cropping frame {} of {:.0f}'.format(frames_croped, n_frames))
             croped_image = self.current_frame[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
             destination_path = output_path + label + str(frames_croped) + '.jpg'
             cv2.imwrite(destination_path, croped_image)
