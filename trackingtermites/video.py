@@ -158,16 +158,19 @@ class VideoPlayer:
         cv2.destroyWindow('ROI selector')
         return ROI
 
-    def crop_roi(self, output_path, label, n_frames):
+    def crop_roi(self, output_path, label, n_frames=-1):
         """Prompt user for a region of interest and crop it from video frames
            saving in output path.
 
         Args:
             output_path (str): path for image files.
             label (str): image label to be inserted in output path.
+            n_frames (int): number of frames to be croped, negative for whole video.
         Returns:
             None.
         """
+        if n_frames < 0:
+            n_frames = self.source.get(cv2.CAP_PROP_FRAME_COUNT)
         roi = self.select_roi()
         roi = [int(coordinate) for coordinate in roi]
         frames_croped = 1
@@ -177,8 +180,3 @@ class VideoPlayer:
             cv2.imwrite(destination_path, croped_image)
             self.next_frame()
             frames_croped += 1
-
-
-if __name__ == '__main__':
-    vd = VideoPlayer('../data/SAM_0056.MP4', (640, 480), [], info=True)
-    vd.crop_roi('../data/development/', 'worker', 3)
