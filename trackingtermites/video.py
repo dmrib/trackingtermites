@@ -52,14 +52,17 @@ class VideoPlayer:
             frame (np.ndarray): next frame.
         """
         self.playing, frame = self.source.read()
-        self.current_frame = cv2.resize(frame, self.default_size)
-        if self.filters:
-            self.current_frame = self.apply_filters(self.current_frame)
 
-        if self.info:
-            cv2.putText(self.current_frame, '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
-                        self.source.get(cv2.CAP_PROP_FRAME_COUNT), self.source.get(cv2.CAP_PROP_FPS)),
-                        (10,10), 1, color=(0, 0, 0), fontScale=0.7)
+        if self.playing:
+            self.current_frame = cv2.resize(frame, self.default_size)
+            
+            if self.filters:
+                self.current_frame = self.apply_filters(self.current_frame)
+
+            if self.info:
+                cv2.putText(self.current_frame, '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
+                            self.source.get(cv2.CAP_PROP_FRAME_COUNT), self.source.get(cv2.CAP_PROP_FPS)),
+                            (10,10), 1, color=(0, 0, 0), fontScale=0.7)
 
     def apply_filters(self, frame):
         """Apply specified filters to frame.
