@@ -85,3 +85,49 @@ class Termite:
             output += '{}, {}, {}, {}, {}\n'.format(frame, location[0], location[1], location[2], location[3])
 
         return output
+
+
+class TermiteTrail:
+    """Convenient representation of a termite path on video for TensorFlow record creation."""
+    def __init__(self, source_path):
+        """Initializer.
+
+        Args:
+            source_path (str): path of trail source file.
+        Returns:
+            None.
+        """
+        self.source_path = source_path
+        self.meta = {}
+        self.trail = []
+
+    def load(self):
+        """Read data from source file.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        meta = {}
+        trail = []
+        with open(self.source_path, mode='r', encoding='utf-8') as data_file:
+            header = data_file.readlines()[:7]
+            for line in header:
+                line = line.lstrip('# ')
+                data = line.split()
+                if data[0] == 'Movie':
+                    if data[1] == 'name:':
+                        meta['movie_name'] = data[2].rstrip('\n')
+                    else:
+                        meta['movie_size'] = (int(data[2].rstrip(',')), int(data[3].rstrip('\n')))
+                elif data[0] == 'Bounding':
+                    meta['b_box_size'] = int(data[3])
+        with open(self.source_path, mode='r', encoding='utf-8') as data_file:
+            data = data_file.readlines()[11:]
+            for line in data:
+                line = line.split()
+                trail.append((int(line[1].rstrip(',')), int(line[2].rstrip(','))))
+
+        self.meta.update(meta)
+        self.trail.extend(trail)
