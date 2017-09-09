@@ -256,5 +256,5 @@ class GeneralTracker:
 
 
 if __name__ == '__main__':
-    termite_tracker = GeneralTracker('../data/sample_input.txt')
+    termite_tracker = GeneralTracker('../config/tracking.conf')
     termite_tracker.run()
