@@ -22,7 +22,8 @@ class GeneralTracker:
         self.termites = []
         self.params = self.read_input(input_path)
         self.video_source = video.VideoPlayer(self.params['video_source'],
-                            self.params['video_source_size'], self.params['filters'])
+                            self.params['video_source_size'],
+                            self.params['filters'], True)
 
     def run(self):
         """Start experiment.

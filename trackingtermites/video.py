@@ -1,32 +1,32 @@
 """Abstracts the video manipulation by OpenCV."""
 
-
 import sys
 import cv2
 
+
 class VideoPlayer:
-    """An image sequence manipulation abstraction."""
-    def __init__(self, source_path, default_size, filters, info=True):
+    """A FSM for video input control."""
+    def __init__(self, video_path, video_shape, filters, write_capture_info):
         """Initializer.
 
         Args:
-            source_path (str): path to video source.
-            default_size (tuple): default size for frame redimensioning.
-            filters (list): list of filters to apply in video source.
-            info (bool): should write frame info.
+            video_path (str): path to video file.
+            video_shape (tuple): default size for frame redimensioning.
+            filters (list): list of filter's names to apply in video source.
+            write_info (bool): should write frame info when displaying.
         Returns:
             None.
         """
-        self.source = cv2.VideoCapture(source_path)
+        self.source = cv2.VideoCapture(video_path)
         if not self.source.isOpened:
-            print('Could not open video.')
+            print('Could not find video file.')
             sys.exit()
 
         self.current_frame = None
         self.playing = False
-        self.default_size = default_size
+        self.video_shape = video_shape
         self.filters = filters
-        self.info = info
+        self.write_capture_info = write_capture_info
         self.start()
 
     def start(self):
@@ -39,30 +39,26 @@ class VideoPlayer:
         """
         self.next_frame()
         if not self.playing:
-            print('Could not read video.')
+            print('Could not read video frame.')
             sys.exit()
 
     def next_frame(self):
-        """Read video next frame.
+        """Read video's next frame.
 
         Args:
             None.
         Returns:
-            is_playing (bool): flag to end of the video.
-            frame (np.ndarray): next frame.
+            None.
         """
-        self.playing, frame = self.source.read()
+        self.playing, self.current_frame = self.source.read()
 
         if self.playing:
-            self.current_frame = cv2.resize(frame, self.default_size)
-            
+            self.current_frame = cv2.resize(self.current_frame,
+                                            self.video_shape)
             if self.filters:
                 self.current_frame = self.apply_filters(self.current_frame)
-
-            if self.info:
-                cv2.putText(self.current_frame, '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
-                            self.source.get(cv2.CAP_PROP_FRAME_COUNT), self.source.get(cv2.CAP_PROP_FPS)),
-                            (10,10), 1, color=(0, 0, 0), fontScale=0.7)
+            if self.write_capture_info:
+                self.write_info()
 
     def apply_filters(self, frame):
         """Apply specified filters to frame.
@@ -81,8 +77,8 @@ class VideoPlayer:
             n_frame = cv2.Canny(n_frame, 100, 200)
         if 't_adaptive' in self.filters:
             n_frame = cv2.adaptiveThreshold(n_frame, 255,
-                                       cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                       cv2.THRESH_BINARY, 115, 1)
+                                            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                            cv2.THRESH_BINARY, 115, 1)
         if 'otsu' in self.filters:
             _, n_frame = cv2.threshold(n_frame, 125, 255,
                                        cv2.THRESH_BINARY+cv2.THRESH_OTSU)
@@ -111,6 +107,19 @@ class VideoPlayer:
         """
         cv2.imshow(window_name, self.current_frame)
 
+    def write_info(self):
+        """Write video status info on current frame.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        cv2.putText(self.current_frame,
+                    '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
+                    self.source.get(cv2.CAP_PROP_FRAME_COUNT), self.source.get(cv2.CAP_PROP_FPS)),
+                    (10,10), 1, color=(0, 0, 0), fontScale=0.7)
+
     def draw_label(self, label, color, coordinate):
         """Draw label at coordinate on current frame.
 
@@ -121,7 +130,8 @@ class VideoPlayer:
         Returns:
             None.
         """
-        cv2.putText(self.current_frame, label, coordinate, 2, color=color, fontScale=0.3)
+        cv2.putText(self.current_frame, label, coordinate, 2, color=color,
+                    fontScale=0.3)
 
     def draw_line(self, origin, end, color):
         """Draw line from origin to end on current frame.
@@ -157,30 +167,7 @@ class VideoPlayer:
         Returns:
             ROI (tuple): selected ROI coordinates.
         """
-        ROI = cv2.selectROI('Select region of interest...', self.current_frame, False, False)
-        cv2.destroyWindow('ROI selector')
+        ROI = cv2.selectROI('Select region of interest...', self.current_frame,
+                            False, False)
+        cv2.destroyWindow('Select region of interest...')
         return ROI
-
-    def crop_roi(self, output_path, label, n_frames=-1):
-        """Prompt user for a region of interest and crop it from video frames
-           saving in output path.
-
-        Args:
-            output_path (str): path for image files.
-            label (str): image label to be inserted in output path.
-            n_frames (int): number of frames to be croped, negative for whole video.
-        Returns:
-            None.
-        """
-        if n_frames < 0:
-            n_frames = self.source.get(cv2.CAP_PROP_FRAME_COUNT)
-        roi = self.select_roi()
-        roi = [int(coordinate) for coordinate in roi]
-        frames_croped = 1
-        while frames_croped <= n_frames:
-            print('Cropping frame {} of {:.0f}'.format(frames_croped, n_frames))
-            croped_image = self.current_frame[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
-            destination_path = output_path + label + str(frames_croped) + '.jpg'
-            cv2.imwrite(destination_path, croped_image)
-            self.next_frame()
-            frames_croped += 1
