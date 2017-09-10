@@ -16,7 +16,7 @@ also included.
 
 [![Demo](http://img.youtube.com/vi/yKXcV2L-ilY/0.jpg)](http://www.youtube.com/watch?v=yKXcV2L-ilY)
 
-The project is conducted at [University Federal of Viçosa Termitology Lab](https://www.isoptera.ufv.br/).
+The project is conducted at [Federal University of Viçosa Termitology Lab](https://www.isoptera.ufv.br/).
 
 Code tested on Windows 10 and Ubuntu 16.04, requires Python >= 3.5.X, OpenCV == 3.0.2,
 Numpy >= 1.13.1.
