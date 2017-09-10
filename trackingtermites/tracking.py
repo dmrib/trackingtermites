@@ -26,7 +26,8 @@ class GeneralTracker:
         self.video_source = video.VideoPlayer(self.params['video_source'],
                                               self.params['output_path'],
                                               self.params['video_source_size'],
-                                              self.params['filters'], True)
+                                              self.params['filters'], True,
+                                              self.params['subtractor'])
 
     def run(self):
         """Start trackers.

@@ -6,7 +6,7 @@ import cv2
 
 class VideoPlayer:
     """A FSM for video input control."""
-    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info):
+    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info, subtractor):
         """Initializer.
 
         Args:
@@ -15,6 +15,7 @@ class VideoPlayer:
             video_shape (tuple): default size for frame redimensioning.
             filters (list): list of filter's names to apply in video source.
             write_info (bool): should write frame info when displaying.
+            subtractor (str): name of background subtractor.
         Returns:
             None.
         """
@@ -24,6 +25,11 @@ class VideoPlayer:
         if not self.source.isOpened:
             print('Could not find video file.')
             sys.exit()
+
+        if subtractor == 'MOG':
+            self.subtractor = cv2.createBackgroundSubtractorMOG2()
+        elif subtractor == 'GMG':
+            self.subtractor = cv2.bgsegm.createBackgroundSubtractorGMG()
 
         self.current_frame = None
         self.playing = False
@@ -89,8 +95,6 @@ class VideoPlayer:
             n_frame = cv2.GaussianBlur(n_frame, (5,5), 0)
         if 'b-filtering' in self.filters:
             n_frame = cv2.bilateralFilter(n_frame, 9, 75, 75)
-        if 'canny' in self.filters:
-            n_frame = cv2.Canny(n_frame, 100, 200)
         if 't_adaptive' in self.filters:
             n_frame = cv2.adaptiveThreshold(n_frame, 255,
                                             cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -98,6 +102,10 @@ class VideoPlayer:
         if 'otsu' in self.filters:
             _, n_frame = cv2.threshold(n_frame, 125, 255,
                                        cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        if 'canny' in self.filters:
+            n_frame = cv2.Canny(n_frame, 100, 200)
+        if 'b-subtraction' in self.filters:
+            n_frame = self.subtractor.apply(frame)
 
         n_frame = cv2.cvtColor(n_frame, cv2.COLOR_GRAY2BGR)
 
