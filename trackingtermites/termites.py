@@ -5,8 +5,8 @@ import math
 
 
 class Termite:
-    """Termite under study abstraction."""
-    def __init__(self, identity, starting_point, box_size=20):
+    """Termite in an experiment."""
+    def __init__(self, identity, starting_point, box_size):
         """Initializer.
 
         Args:
@@ -19,7 +19,8 @@ class Termite:
         self.identity = identity
         self.position = starting_point
         self.box_size = box_size
-        self.color = tuple([random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)])
+        self.color = tuple([random.randint(0, 256), random.randint(0, 256),
+                           random.randint(0, 256)])
         self.tracker = None
         self.path = []
 
@@ -35,7 +36,7 @@ class Termite:
                 int(self.position[1] + self.position[3]))
 
     def detect_encounters(self, others):
-        """Check if termite is encountering with others.
+        """Update termite encounters.
 
         Args:
             others (list): termites to be compared.
@@ -45,10 +46,10 @@ class Termite:
         encountering_with = []
         for other in others:
             if other.identity != self.identity:
-                if (self.position[1] < other.position[1] + self.box_size and
-                    self.position[1] + self.box_size > other.position[1] and
-                    self.position[0] < other.position[0] + self.box_size and
-                    self.box_size + self.position[0] > other.position[0]):
+                if (self.position[0] < other.position[0] + self.box_size and
+                    self.position[0] + self.box_size > other.position[0] and
+                    self.position[1] < other.position[1] + self.box_size and
+                    self.box_size + self.position[1] > other.position[1]):
                     encountering_with.append(other.identity)
         self.encountering_with = encountering_with
 
@@ -57,6 +58,7 @@ class Termite:
 
         Args:
             others (list): termites to be compared.
+            scale (float): distance of 1cm in pixels.
         Returns:
             None.
         """
@@ -80,54 +82,8 @@ class Termite:
         output += '# Termite number: {}\n'.format(self.identity)
         output += '# Color: {}\n\n'.format(self.color)
         output += ('###\n\n')
-        output += ('frame, y, x, colliding, distances\n')
+        output += ('frame, x, y, colliding, distances\n')
         for frame, location in enumerate(self.path):
             output += '{}, {}, {}, {}, {}\n'.format(frame, location[0], location[1], location[2], location[3])
 
         return output
-
-
-class TermiteTrail:
-    """Convenient representation of a termite path on video for TensorFlow record creation."""
-    def __init__(self, source_path):
-        """Initializer.
-
-        Args:
-            source_path (str): path of trail source file.
-        Returns:
-            None.
-        """
-        self.source_path = source_path
-        self.meta = {}
-        self.trail = []
-
-    def load(self):
-        """Read data from source file.
-
-        Args:
-            None.
-        Returns:
-            None.
-        """
-        meta = {}
-        trail = []
-        with open(self.source_path, mode='r', encoding='utf-8') as data_file:
-            header = data_file.readlines()[:7]
-            for line in header:
-                line = line.lstrip('# ')
-                data = line.split()
-                if data[0] == 'Movie':
-                    if data[1] == 'name:':
-                        meta['movie_name'] = data[2].rstrip('\n')
-                    else:
-                        meta['movie_size'] = (int(data[2].rstrip(',')), int(data[3].rstrip('\n')))
-                elif data[0] == 'Bounding':
-                    meta['b_box_size'] = int(data[3])
-        with open(self.source_path, mode='r', encoding='utf-8') as data_file:
-            data = data_file.readlines()[11:]
-            for line in data:
-                line = line.split()
-                trail.append((int(line[1].rstrip(',')), int(line[2].rstrip(','))))
-
-        self.meta.update(meta)
-        self.trail.extend(trail)
