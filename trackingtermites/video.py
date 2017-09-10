@@ -6,11 +6,12 @@ import cv2
 
 class VideoPlayer:
     """A FSM for video input control."""
-    def __init__(self, video_path, video_shape, filters, write_capture_info):
+    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info):
         """Initializer.
 
         Args:
             video_path (str): path to video file.
+            out_path (str): output video destination path.
             video_shape (tuple): default size for frame redimensioning.
             filters (list): list of filter's names to apply in video source.
             write_info (bool): should write frame info when displaying.
@@ -27,6 +28,9 @@ class VideoPlayer:
         self.current_frame = None
         self.playing = False
         self.video_shape = video_shape
+        self.codec = cv2.VideoWriter_fourcc(*'XVID')
+        self.out = cv2.VideoWriter('{}tracking-out.avi'.format(out_path),
+                                   self.codec, 30.0, self.video_shape)
         self.filters = filters
         self.write_capture_info = write_capture_info
         self.start()
@@ -61,6 +65,16 @@ class VideoPlayer:
                 self.current_frame = self.apply_filters(self.current_frame)
             if self.write_capture_info:
                 self.write_info()
+
+    def write_to_out_video(self):
+        """Write current frame to output video file.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        self.out.write(self.current_frame)
 
     def apply_filters(self, frame):
         """Apply specified filters to frame.

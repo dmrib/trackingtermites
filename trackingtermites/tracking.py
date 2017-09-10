@@ -22,6 +22,7 @@ class GeneralTracker:
         self.termites = []
         self.params = self.read_input(config_path)
         self.video_source = video.VideoPlayer(self.params['video_source'],
+                                              self.params['output_path'],
                                               self.params['video_source_size'],
                                               self.params['filters'], True)
 
@@ -68,6 +69,7 @@ class GeneralTracker:
         while self.video_source.playing:
             self.update_termites()
             self.draw()
+            self.video_source.write_to_out_video()
             self.video_source.show_current_frame('Tracking')
 
             pressed_key = cv2.waitKey(1) & 0xff    # Continue if no key is
