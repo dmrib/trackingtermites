@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """This module contains the termite tracking functionalities."""
 
 import cv2
