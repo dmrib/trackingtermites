@@ -130,6 +130,12 @@ class GeneralTracker:
                                                     other_termite.end,
                                                     termite.color)
 
+            if self.params['show_trails']:
+                for step in termite.path[-self.params['trail_size']:]:
+                    self.video_source.draw_step((step[0], step[1]),
+                                                termite.color)
+
+
     def restart_trackers(self, full=False):
         """Restart the tracker instance of termites in the experiment.
 
@@ -185,14 +191,14 @@ class GeneralTracker:
                     filters.append(filtr)
             parameters['filters'] = filters
 
-        integer_parameters = ['n_termites', 'box_size', 'scale']
+        integer_parameters = ['n_termites', 'box_size', 'scale', 'trail_size']
         for parameter in integer_parameters:
             parameters[parameter] = int(parameters[parameter])
 
 
         boolean_parameters = ['show_labels', 'highlight_collisions',
                               'show_bounding_box', 'show_frame_info',
-                              'show_d_lines']
+                              'show_d_lines', 'show_trails']
         for parameter in boolean_parameters:
             if parameters[parameter].lower() == 'true':
                 parameters[parameter] = True

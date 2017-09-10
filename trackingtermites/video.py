@@ -175,6 +175,17 @@ class VideoPlayer:
         else:
             cv2.rectangle(self.current_frame, origin, end, color)
 
+    def draw_step(self, center, color):
+        """Draw circle representing termite step on current frame.
+
+        Args:
+            center (tuple): coordinates of step.
+            color (tuple): termite color.
+        Returns:
+            None.
+        """
+        cv2.circle(self.current_frame, center, 1, color, -1)
+
     def select_roi(self):
         """Prompt user for a region of interest.
 
