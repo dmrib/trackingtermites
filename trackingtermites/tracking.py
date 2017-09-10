@@ -1,32 +1,32 @@
 """This module contains the termite tracking functionalities."""
 
-import datetime
 import cv2
+import datetime
 import os
 import sys
 
-import video
 import termites as trmt
+import video
 
 
 class GeneralTracker:
-    """Tracking experiment abstraction."""
-    def __init__(self, input_path):
+    """Termite tracker using OpenCV API."""
+    def __init__(self, config_path):
         """Initializer.
 
         Args:
-            input_path (str): path of input file.
+            config_path (str): path of tracker config file.
         Returns:
             None.
         """
         self.termites = []
-        self.params = self.read_input(input_path)
+        self.params = self.read_input(config_path)
         self.video_source = video.VideoPlayer(self.params['video_source'],
-                            self.params['video_source_size'],
-                            self.params['filters'], True)
+                                              self.params['video_source_size'],
+                                              self.params['filters'], True)
 
     def run(self):
-        """Start experiment.
+        """Start trackers.
 
         Args:
             None.
@@ -37,7 +37,7 @@ class GeneralTracker:
         self.track_all()
 
     def locate_termites(self):
-        """Open GUI tool for selecting termite to be tracked.
+        """Open GUI tool for termites area selection.
 
         Args:
             None.
@@ -46,7 +46,8 @@ class GeneralTracker:
         """
         for t_number in range(self.params['n_termites']):
             roi = self.video_source.select_roi()
-            starting_box = (roi[0], roi[1], self.params['box_size'], self.params['box_size'])
+            starting_box = (roi[0], roi[1], self.params['box_size'],
+                            self.params['box_size'])
 
             termite = trmt.Termite(t_number+1, starting_box, starting_box[2])
             termite.tracker = cv2.Tracker_create(self.params['method'])
@@ -69,8 +70,8 @@ class GeneralTracker:
             self.draw()
             self.video_source.show_current_frame('Tracking')
 
-            pressed_key = cv2.waitKey(1) & 0xff    # Continue if no key is being pressed
-            if pressed_key == 27:
+            pressed_key = cv2.waitKey(1) & 0xff    # Continue if no key is
+            if pressed_key == 27:                  # being pressed.
                 break
             elif pressed_key == ord('r'):
                 self.restart_trackers(full=True)
@@ -98,7 +99,8 @@ class GeneralTracker:
                 self.video_source.pause()
             termite.detect_encounters(self.termites)
             termite.compute_distances(self.termites, self.params['scale'])
-            termite.path.append([int(termite.position[0]), int(termite.position[1]), termite.encountering_with, termite.distances])
+            termite.path.append([int(termite.position[0]), int(termite.position[1]),
+                                termite.encountering_with, termite.distances])
 
     def draw(self):
         """Draw bounding box in the tracked termites.
@@ -110,16 +112,21 @@ class GeneralTracker:
         """
         for termite in self.termites:
             if self.params['show_labels']:
-                self.video_source.draw_label(str(termite.identity), termite.color, (termite.end[0]+5, termite.end[1]+5))
+                self.video_source.draw_label(str(termite.identity), termite.color,
+                                             (termite.end[0]+5, termite.end[1]+5))
             if termite.encountering_with and self.params['highlight_collisions']:
-                    self.video_source.draw_b_box(termite.origin, termite.end, termite.color, strong=True)
+                    self.video_source.draw_b_box(termite.origin, termite.end,
+                                                 termite.color, strong=True)
             else:
                 if self.params['show_bounding_box']:
-                    self.video_source.draw_b_box(termite.origin, termite.end, termite.color)
+                    self.video_source.draw_b_box(termite.origin, termite.end,
+                                                 termite.color)
             if self.params['show_d_lines']:
                 for other_termite in self.termites:
                     if other_termite.identity != termite.identity:
-                        self.video_source.draw_line(termite.origin, other_termite.end, termite.color)
+                        self.video_source.draw_line(termite.origin,
+                                                    other_termite.end,
+                                                    termite.color)
 
     def restart_trackers(self, full=False):
         """Restart the tracker instance of termites in the experiment.
@@ -145,32 +152,33 @@ class GeneralTracker:
             None.
         """
         recover_point = self.video_source.select_roi()
-        new_region = (recover_point[0], recover_point[1], self.params['box_size'], self.params['box_size'])
+        new_region = (recover_point[0], recover_point[1], self.params['box_size'],
+                      self.params['box_size'])
         termite.tracker = cv2.Tracker_create(self.params['method'])
         termite.tracker.init(self.video_source.current_frame, new_region)
 
-    def read_input(self, input_path):
+    def read_input(self, config_path):
         """Read input file and creates parameters dictionary.
 
         Args:
-            input_path (str): path to input file.
+            config_path (str): path to configuration file.
         Returns:
-            parameters (dict): experiment parameters.
+            parameters (dict): trackers parameters.
         """
         parameters = {}
-        with open(input_path, mode='r', encoding='utf-8') as input_file:
+        with open(config_path, mode='r', encoding='utf-8') as input_file:
             for line in input_file:
                 if not line[0] == '\n' and not line[0] == '#' and not line[0] == ' ':
-                    param, value = line.rstrip('\n').split(' ')
+                    param, value = line.strip().split(' ')
                     parameters[param] = value
 
         if 'video_source_size' in parameters:
-            y, x = parameters['video_source_size'].rstrip('\n').split(',')
-            parameters['video_source_size'] = tuple([int(y), int(x)])
+            width, height = parameters['video_source_size'].strip().split(',')
+            parameters['video_source_size'] = tuple([int(width), int(height)])
 
         if 'filters' in parameters:
             filters = []
-            for filtr in parameters['filters'].rstrip('\n').split(','):
+            for filtr in parameters['filters'].strip().split(','):
                 if filtr != 'None':
                     filters.append(filtr)
             parameters['filters'] = filters
@@ -192,7 +200,7 @@ class GeneralTracker:
         return parameters
 
     def write_output(self):
-        """Write output data to file.
+        """Write trackers output data to file.
 
         Args:
             None.
@@ -226,7 +234,7 @@ class GeneralTracker:
         header = ''
         header += '# Date: {}\n'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         header += '# Movie name: {}\n'.format(self.params['video_source'].split('/')[-1])
-        header += '# Movie size: {}, {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
+        header += '# Movie shape: {}, {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
         header += '# Filters: {}\n'.format(self.params['filters'])
         header += '# Bounding box size: {}\n'.format(self.params['box_size'])
 
@@ -248,10 +256,17 @@ class GeneralTracker:
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
                 if not termite.path[step][2]:
-                    summary += '{}, {}, {}, {}, 0\n'.format(step, termite.path[step][0], termite.path[step][1], termite.identity)
+                    summary += '{}, {}, {}, {}, 0\n'.format(step,
+                                                            termite.path[step][0],
+                                                            termite.path[step][1],
+                                                            termite.identity)
                 else:
                     for encounter in termite.path[step][2]:
-                        summary += '{}, {}, {}, {}, {}\n'.format(step, termite.path[step][0], termite.path[step][1], termite.identity, encounter)
+                        summary += '{}, {}, {}, {}, {}\n'.format(step,
+                                                                 termite.path[step][0],
+                                                                 termite.path[step][1],
+                                                                 termite.identity,
+                                                                 encounter)
 
         return summary
 
