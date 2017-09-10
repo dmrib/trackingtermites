@@ -17,6 +17,8 @@ class VideoPlayer:
         Returns:
             None.
         """
+        if video_path == '-1':
+            video_path = int(video_path)
         self.source = cv2.VideoCapture(video_path)
         if not self.source.isOpened:
             print('Could not find video file.')
