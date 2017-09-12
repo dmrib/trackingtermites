@@ -250,7 +250,7 @@ class GeneralTracker:
         header = ''
         header += '# Date: {}\n'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         header += '# Movie name: {}\n'.format(self.params['video_source'].split('/')[-1])
-        header += '# Movie shape: {}, {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
+        header += '# Movie shape(w,h): {} x {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
         header += '# Filters: {}\n'.format(self.params['filters'])
         header += '# Bounding box size: {}\n'.format(self.params['box_size'])
 
@@ -266,9 +266,9 @@ class GeneralTracker:
         """
         header = self.create_header()
         summary = ''
-        summary += '# Encounters summary\n'
+        summary += '# Encounters summary\n\n'
         summary += header
-        summary += '\n\n###\n\n'
+        summary += '\n###\n\n'
         summary += 'frame, x, y, termite, encountering_with\n'
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
@@ -297,9 +297,9 @@ class GeneralTracker:
         """
         header = self.create_header()
         summary = ''
-        summary += '# Velocity summary\n'
+        summary += '# Velocity summary\n\n'
         summary += header
-        summary += '\n\n###\n\n'
+        summary += '\n###\n\n'
         summary += 'termite, frame, time, x, y\n'
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
