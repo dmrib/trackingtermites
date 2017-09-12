@@ -3,7 +3,7 @@
 """This module contains the termite tracking functionalities."""
 
 import cv2
-import datetime
+import datetime, time
 import os
 import sys
 
@@ -105,7 +105,8 @@ class GeneralTracker:
             termite.detect_encounters(self.termites)
             termite.compute_distances(self.termites, self.params['scale'])
             termite.path.append([int(termite.position[0]), int(termite.position[1]),
-                                termite.encountering_with, termite.distances])
+                                termite.encountering_with, termite.distances,
+                                self.video_source.source.get(cv2.CAP_PROP_POS_MSEC)])
 
     def draw(self):
         """Draw bounding box in the tracked termites.
@@ -133,7 +134,7 @@ class GeneralTracker:
                                                     other_termite.end,
                                                     termite.color)
 
-            if self.params['show_trails']:
+            if self.params['show_trails'] and self.params['trail_size'] != 0:
                 for step in termite.path[-self.params['trail_size']:]:
                     self.video_source.draw_step((step[0], step[1]),
                                                 termite.color)
@@ -224,9 +225,13 @@ class GeneralTracker:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
-        summary_output = output_path + '/experiment_summary.dat'
+        summary_output = output_path + '/encounters_summary.dat'
         with open(summary_output, mode='w', encoding='utf-8') as summ_file:
-            summ_file.write(self.create_summary())
+            summ_file.write(self.create_encounters_summary())
+
+        velocity_output = output_path + '/velocity_summary.dat'
+        with open(velocity_output, mode='w', encoding='utf-8') as vel_output:
+            vel_output.write(self.create_velocity_summary())
 
         for termite in self.termites:
             termite_output = output_path + '/termite-{}.dat'.format(termite.identity)
@@ -251,7 +256,7 @@ class GeneralTracker:
 
         return header
 
-    def create_summary(self):
+    def create_encounters_summary(self):
         """Creates summary description of an experiment encounters.
 
         Args:
@@ -261,19 +266,20 @@ class GeneralTracker:
         """
         header = self.create_header()
         summary = ''
-        summary += '# Experiment summary\n'
+        summary += '# Encounters summary\n'
         summary += header
         summary += '\n\n###\n\n'
+        summary += 'frame, x, y, termite, encountering_with\n'
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
                 if not termite.path[step][2]:
-                    summary += '{}, {}, {}, {}, 0\n'.format(step,
+                    summary += '{}, {}, {}, {}, 0\n'.format(step+1,
                                                             termite.path[step][0],
                                                             termite.path[step][1],
                                                             termite.identity)
                 else:
                     for encounter in termite.path[step][2]:
-                        summary += '{}, {}, {}, {}, {}\n'.format(step,
+                        summary += '{}, {}, {}, {}, {}\n'.format(step+1,
                                                                  termite.path[step][0],
                                                                  termite.path[step][1],
                                                                  termite.identity,
@@ -281,6 +287,28 @@ class GeneralTracker:
 
         return summary
 
+    def create_velocity_summary(self):
+        """Creates summary of termite position in experiment by time.
+
+        Args:
+            None.
+        Returns:
+            summary (str): experiment positions by time summary.
+        """
+        header = self.create_header()
+        summary = ''
+        summary += '# Velocity summary\n'
+        summary += header
+        summary += '\n\n###\n\n'
+        summary += 'termite, frame, time, x, y\n'
+        for step in range(len(self.termites[0].path)):
+            for termite in self.termites:
+                summary += '{}, {}, {}, {}, {}\n'.format(termite.identity, step+1,
+                                                     time.strftime("%H:%M:%S", time.gmtime(int(termite.path[step][4])/1000)),
+                                                     termite.path[step][0],
+                                                     termite.path[step][1])
+
+        return summary
 
 if __name__ == '__main__':
     termite_tracker = GeneralTracker('../config/tracking.conf')
