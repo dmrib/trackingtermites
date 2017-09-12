@@ -41,6 +41,21 @@ class VideoPlayer:
         self.write_capture_info = write_capture_info
         self.start()
 
+    @property
+    def fps(self):
+        """Original video fps count."""
+        return self.source.get(cv2.CAP_PROP_FPS)
+
+    @property
+    def current_frame_number(self):
+        """Current frame number in video sequence."""
+        return self.source.get(cv2.CAP_PROP_POS_FRAMES)
+
+    @property
+    def number_of_frames(self):
+        """Total number of frames in video source."""
+        return self.source.get(cv2.CAP_PROP_FRAME_COUNT)
+
     def start(self):
         """Read video capture first frame.
 
@@ -140,9 +155,9 @@ class VideoPlayer:
             None.
         """
         cv2.putText(self.current_frame,
-                    '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.source.get(cv2.CAP_PROP_POS_FRAMES),
-                    self.source.get(cv2.CAP_PROP_FRAME_COUNT), self.source.get(cv2.CAP_PROP_FPS)),
-                    (10,10), 1, color=(0, 0, 0), fontScale=0.7)
+                    '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.current_frame_number,
+                    self.number_of_frames, self.fps), (10,10), 1, color=(0, 0, 0),
+                    fontScale=0.7)
 
     def draw_label(self, label, color, coordinate):
         """Draw label at coordinate on current frame.
