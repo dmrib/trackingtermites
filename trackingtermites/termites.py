@@ -70,11 +70,11 @@ class Termite:
             distances.append(distance)
         self.distances = distances
 
-    def generate_output(self):
+    def generate_output(self, frame_number_dimension):
         """Create output string for a termite.
 
         Args:
-            None.
+            frame_number_dimension (int): dimension of number of frames for string formatting.
         Returns:
             output (str): output string.
         """
@@ -84,6 +84,7 @@ class Termite:
         output += ('###\n\n')
         output += ('frame, x, y, colliding, distances\n')
         for frame, location in enumerate(self.path):
-            output += 'f{}, {}, {}, {}, {}\n'.format(frame, location[0], location[1], location[2], location[3])
+            n_frame = str(frame+1).zfill(len(str(int(frame_number_dimension))))
+            output += 'f{}, {}, {}, {}, {}\n'.format(n_frame, location[0], location[1], location[2], location[3])
 
         return output

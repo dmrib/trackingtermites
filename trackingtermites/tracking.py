@@ -237,7 +237,7 @@ class GeneralTracker:
             termite_output = output_path + '/termite-{}.dat'.format(termite.identity)
             with open(termite_output, mode='w', encoding='utf-8') as out_file:
                 out_file.write(header)
-                out_file.write(termite.generate_output())
+                out_file.write(termite.generate_output(self.video_source.number_of_frames))
 
     def create_header(self):
         """Creates header string of an experiment.
@@ -272,15 +272,16 @@ class GeneralTracker:
         summary += '\n###\n\n'
         summary += 'frame, x, y, termite, encountering_with\n'
         for step in range(len(self.termites[0].path)):
+            n_frame = str(step+1).zfill(len(str(int(self.video_source.number_of_frames))))
             for termite in self.termites:
                 if not termite.path[step][2]:
-                    summary += 'f{}, {}, {}, t{}, t0\n'.format(step+1,
+                    summary += 'f{}, {}, {}, t{}, t0\n'.format(n_frame,
                                                             termite.path[step][0],
                                                             termite.path[step][1],
                                                             termite.identity)
                 else:
                     for encounter in termite.path[step][2]:
-                        summary += 'f{}, {}, {}, t{}, t{}\n'.format(step+1,
+                        summary += 'f{}, {}, {}, t{}, t{}\n'.format(n_frame,
                                                                  termite.path[step][0],
                                                                  termite.path[step][1],
                                                                  termite.identity,
@@ -304,7 +305,8 @@ class GeneralTracker:
         summary += 'termite, frame, time, x, y\n'
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
-                summary += 't{}, f{}, {}, {}, {}\n'.format(termite.identity, step+1,
+                n_frame = str(step+1).zfill(len(str(int(self.video_source.number_of_frames))))
+                summary += 't{}, f{}, {}, {}, {}\n'.format(termite.identity, n_frame,
                                                      time.strftime("%H:%M:%S", time.gmtime(int(termite.path[step][4])/1000)),
                                                      termite.path[step][0],
                                                      termite.path[step][1])
