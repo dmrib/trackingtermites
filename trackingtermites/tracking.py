@@ -252,6 +252,7 @@ class GeneralTracker:
         header += '# Movie name: {}\n'.format(self.params['video_source'].split('/')[-1])
         header += '# Movie shape(w,h): {} x {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
         header += '# Movie scale(px to cm): {}\n'.format(self.params['scale'])
+        header += '# Movie fps: {}\n'.format(int(self.video_source.fps))
         header += '# Filters: {}\n'.format(self.params['filters'])
         header += '# Bounding box size: {}\n'.format(self.params['box_size'])
 
