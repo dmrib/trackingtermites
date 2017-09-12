@@ -84,6 +84,6 @@ class Termite:
         output += ('###\n\n')
         output += ('frame, x, y, colliding, distances\n')
         for frame, location in enumerate(self.path):
-            output += '{}, {}, {}, {}, {}\n'.format(frame, location[0], location[1], location[2], location[3])
+            output += 'f{}, {}, {}, {}, {}\n'.format(frame, location[0], location[1], location[2], location[3])
 
         return output

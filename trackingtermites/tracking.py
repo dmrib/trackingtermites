@@ -274,13 +274,13 @@ class GeneralTracker:
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
                 if not termite.path[step][2]:
-                    summary += '{}, {}, {}, {}, 0\n'.format(step+1,
+                    summary += 'f{}, {}, {}, t{}, t0\n'.format(step+1,
                                                             termite.path[step][0],
                                                             termite.path[step][1],
                                                             termite.identity)
                 else:
                     for encounter in termite.path[step][2]:
-                        summary += '{}, {}, {}, {}, {}\n'.format(step+1,
+                        summary += 'f{}, {}, {}, t{}, t{}\n'.format(step+1,
                                                                  termite.path[step][0],
                                                                  termite.path[step][1],
                                                                  termite.identity,
@@ -304,7 +304,7 @@ class GeneralTracker:
         summary += 'termite, frame, time, x, y\n'
         for step in range(len(self.termites[0].path)):
             for termite in self.termites:
-                summary += '{}, {}, {}, {}, {}\n'.format(termite.identity, step+1,
+                summary += 't{}, f{}, {}, {}, {}\n'.format(termite.identity, step+1,
                                                      time.strftime("%H:%M:%S", time.gmtime(int(termite.path[step][4])/1000)),
                                                      termite.path[step][0],
                                                      termite.path[step][1])
