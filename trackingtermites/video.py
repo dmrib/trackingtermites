@@ -221,3 +221,39 @@ class VideoPlayer:
                             False, False)
         cv2.destroyWindow('Select region of interest...')
         return ROI
+
+
+class VideoScraper:
+    """Save every video frame as a separate image."""
+    def __init__(self, video_path, images_path, prefix, images_format):
+        """Initializer.
+
+        Args:
+            video_path (str): path to video source.
+            images_path (str): destination path to images.
+            images_format (str): output images format.
+            prefix (str): images names prefix.
+        """
+        self.video_path = video_path
+        self.images_path = images_path
+        self.images_format = images_format
+        self.prefix = prefix
+
+    def scrape(self):
+        """Scrape frames from the given video.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        frame_number = 1
+        self.source = cv2.VideoCapture(self.video_path)
+        while True:
+            playing, frame = self.source.read()
+            if not playing:
+                break
+            cv2.imshow('Scraping...', frame)
+            cv2.waitKey(1)
+            cv2.imwrite('{}{}-{}.{}'.format(self.images_path, self.prefix, frame_number, self.images_format), frame)
+            frame_number += 1
