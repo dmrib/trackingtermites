@@ -28,10 +28,20 @@ class Dataset:
             None.
         """
         termites_files = glob.glob('{}termite*'.format(self.trails_folder))
+        self.load_termites(termites_files)
 
+    def load_termites(self, termites_files):
+        """Load termites trails from given files.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
         for trail in termites_files:
             self.termites.append(trmt.TermiteRecord(trail))
 
+
 if __name__ == '__main__':
-    dat = Dataset('../data/dev/')
+    dat = Dataset('../data/development/')
     dat.create_dataset()

@@ -102,6 +102,8 @@ class TermiteRecord:
         """
         self.source = source
         self.movie_name = None
+        self.movie_shape = None
+        self.bounding_box_size = None
         self.trail = []
         self.load_from_file()
 
@@ -118,7 +120,14 @@ class TermiteRecord:
                 if 'Movie name' in line:
                     _, _, _, self.movie_name = line.split()
                     self.movie_name.strip()
+                elif 'Movie shape' in line:
+                    _,_,_,x,_,y = line.split()
+                    self.movie_shape = (int(x),int(y))
+                elif 'Bounding' in line:
+                    _, _, _, _, box_size = line.split()
+                    self.bounding_box_size = int(box_size)
+                    print(self.bounding_box_size)
                 else:
-                    if not line.startswith('#') and not line.startswith('frame') and not line=='\n':
+                    if not line.startswith('#') and not line.startswith('frame') and not line == '\n':
                         line_values = line.split()
                         self.trail.append((int(line_values[1].rstrip(',')), int(line_values[2].rstrip(','))))
