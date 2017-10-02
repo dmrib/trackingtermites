@@ -88,3 +88,37 @@ class Termite:
             output += 'f{}, {}, {}, {}, {}\n'.format(n_frame, location[0], location[1], location[2], location[3])
 
         return output
+
+
+class TermiteRecord:
+    """Termite data from a previous tracking experiment."""
+    def __init__(self, source):
+        """Initializer.
+
+        Args:
+            source (str): path to source file.
+        Returns:
+            None.
+        """
+        self.source = source
+        self.movie_name = None
+        self.trail = []
+        self.load_from_file()
+
+    def load_from_file(self):
+        """Load termite trail from source file.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        with open(self.source) as source_file:
+            for line in source_file:
+                if 'Movie name' in line:
+                    _, _, _, self.movie_name = line.split()
+                    self.movie_name.strip()
+                else:
+                    if not line.startswith('#') and not line.startswith('frame') and not line=='\n':
+                        line_values = line.split()
+                        self.trail.append((int(line_values[1].rstrip(',')), int(line_values[2].rstrip(','))))
