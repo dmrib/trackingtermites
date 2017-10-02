@@ -86,9 +86,9 @@ class GeneralTracker:
             elif pressed_key == ord('p'):
                 self.video_source.pause()
             elif pressed_key == ord(','):
-                self.increase_current_speed()
-            elif pressed_key == ord('.'):
                 self.decrease_current_speed()
+            elif pressed_key == ord('.'):
+                self.increase_current_speed()
 
             self.video_source.next_frame()
 
@@ -174,8 +174,8 @@ class GeneralTracker:
         termite.tracker = cv2.Tracker_create(self.params['method'])
         termite.tracker.init(self.video_source.current_frame, new_region)
 
-    def increase_current_speed(self):
-        """Increase tracker video output speed.
+    def decrease_current_speed(self):
+        """Decrease tracker video output speed.
 
         Args:
             None.
@@ -184,8 +184,8 @@ class GeneralTracker:
         """
         self.current_speed += 50
 
-    def decrease_current_speed(self):
-        """Decrease tracker video output speed.
+    def increase_current_speed(self):
+        """Increase tracker video output speed.
 
         Args:
             None.
