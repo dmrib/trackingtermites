@@ -28,6 +28,7 @@ class GeneralTracker:
                                               self.params['video_source_size'],
                                               self.params['filters'], True,
                                               self.params['subtractor'])
+        self.current_speed = 1
 
     def run(self):
         """Start trackers.
@@ -75,8 +76,8 @@ class GeneralTracker:
             self.video_source.write_to_out_video()
             self.video_source.show_current_frame('Tracking')
 
-            pressed_key = cv2.waitKey(1) & 0xff    # Continue if no key is
-            if pressed_key == 27:                  # being pressed.
+            pressed_key = cv2.waitKey(self.current_speed) & 0xff    # Continue if no key is
+            if pressed_key == 27:                                   # being pressed.
                 break
             elif pressed_key == ord('r'):
                 self.restart_trackers(full=True)
@@ -84,6 +85,10 @@ class GeneralTracker:
                 self.restart_trackers()
             elif pressed_key == ord('p'):
                 self.video_source.pause()
+            elif pressed_key == ord(','):
+                self.increase_current_speed()
+            elif pressed_key == ord('.'):
+                self.decrease_current_speed()
 
             self.video_source.next_frame()
 
@@ -168,6 +173,32 @@ class GeneralTracker:
                       self.params['box_size'])
         termite.tracker = cv2.Tracker_create(self.params['method'])
         termite.tracker.init(self.video_source.current_frame, new_region)
+
+    def increase_current_speed(self):
+        """Increase tracker video output speed.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        self.current_speed += 50
+
+    def decrease_current_speed(self):
+        """Decrease tracker video output speed.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        if self.current_speed - 50 < 0:
+            self.current_speed = 1
+        elif self.current_speed == 1:
+            self.current_speed = 0
+        else:
+            self.current_speed -= 50
+
 
     def read_input(self, config_path):
         """Read input file and creates parameters dictionary.
