@@ -6,7 +6,7 @@ import glob
 import termites as trmt
 
 
-class Dataset:
+class TermiteImageDataset:
     """Termite image dataset abstraction."""
     def __init__(self, trails_folder):
         """Initializer.
@@ -41,7 +41,32 @@ class Dataset:
         for trail in termites_files:
             self.termites.append(trmt.TermiteRecord(trail))
 
+    def to_csv(self, destination):
+        """Write dataset in csv representation.
+
+        Args:
+            destination (str): files destination path.
+        Returns:
+            None.
+        """
+        with open(destination, mode='w') as csv_file:
+            csv_file.write('filename, width, height, class, xmin, ymin, xmax, ymax\n')
+            for termite in self.termites:
+                for path_number, path in enumerate(termite.trail):
+                    csv_file.write('{}-{}.png, {}, {}, {}, {}, {}, {}, {}\n'.format(
+                        termite.movie_name[:-4],
+                        path_number,
+                        termite.movie_shape[0],
+                        termite.movie_shape[1],
+                        termite.movie_name[:3],
+                        path[0],
+                        path[1],
+                        path[0] + termite.bounding_box_size,
+                        path[1] + termite.bounding_box_size,
+                    ))
+
 
 if __name__ == '__main__':
-    dat = Dataset('../data/development/')
+    dat = TermiteImageDataset('../data/development/')
     dat.create_dataset()
+    dat.to_csv('../data/dataset.csv')
