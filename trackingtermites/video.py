@@ -156,7 +156,7 @@ class VideoPlayer:
         """
         cv2.putText(self.current_frame,
                     '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.current_frame_number,
-                    self.number_of_frames, self.fps), (10,10), 1, color=(0, 0, 0),
+                    self.number_of_frames, self.fps), (10,10), 1, color=(0, 0, 255),
                     fontScale=0.7)
 
     def draw_label(self, label, color, coordinate):
