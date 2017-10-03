@@ -55,7 +55,7 @@ class TermiteImageDataset:
                 for path_number, path in enumerate(termite.trail):
                     csv_file.write('{}-{}.png, {}, {}, {}, {}, {}, {}, {}\n'.format(
                         termite.movie_name[:-4],
-                        path_number,
+                        path_number+1,
                         termite.movie_shape[0],
                         termite.movie_shape[1],
                         termite.movie_name[:3],
