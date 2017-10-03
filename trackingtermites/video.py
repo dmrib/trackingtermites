@@ -239,11 +239,12 @@ class VideoScraper:
         self.images_format = images_format
         self.prefix = prefix
 
-    def scrape(self):
+    def scrape(self, last_frame, shape):
         """Scrape frames from the given video.
 
         Args:
-            None.
+            last_frame (int): last frame to be scraped.
+            shape (tuple): video resizing dimensions.
         Returns:
             None.
         """
@@ -251,9 +252,15 @@ class VideoScraper:
         self.source = cv2.VideoCapture(self.video_path)
         while True:
             playing, frame = self.source.read()
-            if not playing:
+            frame = cv2.resize(frame, shape)
+            if not playing or frame_number > last_frame:
                 break
             cv2.imshow('Scraping...', frame)
             cv2.waitKey(1)
             cv2.imwrite('{}{}-{}.{}'.format(self.images_path, self.prefix, frame_number, self.images_format), frame)
             frame_number += 1
+
+
+if __name__ == '__main__':
+    scpr = VideoScraper('/media/dmrib/38411FD55CCC5DA2/dmrib-footage/wrk-1.MP4', '../data/images/', 'sdr-1', 'png')
+    scpr.scrape(5000, (640,480))
