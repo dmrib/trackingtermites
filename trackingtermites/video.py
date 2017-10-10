@@ -239,7 +239,7 @@ class VideoScraper:
         self.images_format = images_format
         self.prefix = prefix
 
-    def scrape(self, last_frame, shape):
+    def scrape(self, last_frame, shape, select_roi=False):
         """Scrape frames from the given video.
 
         Args:
@@ -251,16 +251,18 @@ class VideoScraper:
         frame_number = 1
         self.source = cv2.VideoCapture(self.video_path)
         while True:
+            if not self.source.isOpened():
+                print("Couldn't open video.")
+                sys.exit()
             playing, frame = self.source.read()
-            frame = cv2.resize(frame, shape)
             if not playing or frame_number > last_frame:
                 break
+            frame = cv2.resize(frame, shape)
+            if select_roi and frame_number == 1:
+                roi = cv2.selectROI('Select ROI for cropping', frame, False, False)
+            if select_roi:
+                frame = frame[int(roi[1]):int(roi[1]+roi[3]), int(roi[0]):int(roi[0]+roi[2])]
             cv2.imshow('Scraping...', frame)
             cv2.waitKey(1)
             cv2.imwrite('{}{}-{}.{}'.format(self.images_path, self.prefix, frame_number, self.images_format), frame)
             frame_number += 1
-
-
-if __name__ == '__main__':
-    scpr = VideoScraper('/media/dmrib/38411FD55CCC5DA2/dmrib-footage/wrk-1.MP4', '../data/images/', 'sdr-1', 'png')
-    scpr.scrape(5000, (640,480))
