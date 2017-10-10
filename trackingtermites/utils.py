@@ -6,7 +6,7 @@ boolean_parameters = ['show_labels', 'highlight_collisions',
 
 tuple_parameters = ['video_source_size', 'arena_size']
 
-integer_parameters = ['n_termites', 'box_size', 'scale', 'trail_size']
+integer_parameters = ['n_termites', 'box_size', 'scale', 'trail_size', 'termite_radius']
 
 list_parameters = ['filters']
 
