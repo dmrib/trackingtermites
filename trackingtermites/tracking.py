@@ -9,6 +9,7 @@ import sys
 
 import termites as trmt
 import video
+import utils
 
 
 class GeneralTracker:
@@ -22,7 +23,7 @@ class GeneralTracker:
             None.
         """
         self.termites = []
-        self.params = self.read_input(config_path)
+        self.params = utils.read_config_file(config_path)
         self.video_source = video.VideoPlayer(self.params['video_source'],
                                               self.params['output_path'],
                                               self.params['video_source_size'],
@@ -198,49 +199,6 @@ class GeneralTracker:
             self.current_speed = 0
         else:
             self.current_speed -= 50
-
-
-    def read_input(self, config_path):
-        """Read input file and creates parameters dictionary.
-
-        Args:
-            config_path (str): path to configuration file.
-        Returns:
-            parameters (dict): trackers parameters.
-        """
-        parameters = {}
-        with open(config_path, mode='r', encoding='utf-8') as input_file:
-            for line in input_file:
-                if not line[0] == '\n' and not line[0] == '#' and not line[0] == ' ':
-                    param, value = line.strip().split(' ')
-                    parameters[param] = value
-
-        if 'video_source_size' in parameters:
-            width, height = parameters['video_source_size'].strip().split(',')
-            parameters['video_source_size'] = tuple([int(width), int(height)])
-
-        if 'filters' in parameters:
-            filters = []
-            for filtr in parameters['filters'].strip().split(','):
-                if filtr != 'None':
-                    filters.append(filtr)
-            parameters['filters'] = filters
-
-        integer_parameters = ['n_termites', 'box_size', 'scale', 'trail_size']
-        for parameter in integer_parameters:
-            parameters[parameter] = int(parameters[parameter])
-
-
-        boolean_parameters = ['show_labels', 'highlight_collisions',
-                              'show_bounding_box', 'show_frame_info',
-                              'show_d_lines', 'show_trails']
-        for parameter in boolean_parameters:
-            if parameters[parameter].lower() == 'true':
-                parameters[parameter] = True
-            else:
-                parameters[parameter] = False
-
-        return parameters
 
     def write_output(self):
         """Write trackers output data to file.
