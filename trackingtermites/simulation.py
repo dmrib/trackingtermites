@@ -62,6 +62,9 @@ class Simulation:
                 cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 1)
                 cv2.putText(background, termite.number, termite.trail[frame_number], 2, color=termite.color,
                             fontScale=0.3)
+                for step in termite.trail[max(0, frame_number-self.params['trail_size']):frame_number]:
+                    cv2.circle(background, step, 1, termite.color, -1)
+
             cv2.imshow('Arena', np.hstack((frame, background)))
             cv2.waitKey(1)
             frame_number += 1
