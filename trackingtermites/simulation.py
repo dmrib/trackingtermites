@@ -62,12 +62,10 @@ class Simulation:
                 cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 3)
                 cv2.putText(background, termite.number, termite.trail[frame_number], 2, color=termite.color,
                             fontScale=0.3)
-                head = (termite.trail[frame_number+10][0],termite.trail[frame_number+10][1])
-                cv2.circle(background, head, 8, termite.color, 1)
                 for step in termite.trail[max(0, frame_number-self.params['trail_size']):frame_number]:
                     cv2.circle(background, step, 1, termite.color, -1)
 
-            cv2.imshow('Arena', np.hstack((frame, background)))
+            cv2.imshow('Movement Simulation', np.hstack((frame, background)))
             pressed_key = cv2.waitKey(1) & 0xff
             if pressed_key == ord('p'):
                 cv2.waitKey(0)
