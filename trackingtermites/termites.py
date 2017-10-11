@@ -104,6 +104,7 @@ class TermiteRecord:
         self.movie_name = None
         self.movie_shape = None
         self.bounding_box_size = None
+        self.number = None
         self.color = None
         self.trail = []
         self.load_from_file()
@@ -127,6 +128,9 @@ class TermiteRecord:
                 elif 'Bounding' in line:
                     _, _, _, _, box_size = line.split()
                     self.bounding_box_size = int(box_size)
+                elif 'number' in line:
+                    _, _, _, number = line.split()
+                    self.number = number
                 elif 'Color' in line:
                     _, _, b, g, r = line.split()
                     self.color = (int(b.lstrip('(').rstrip(',')),

@@ -60,6 +60,8 @@ class Simulation:
             background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0], 3), np.uint8)
             for termite in self.termites:
                 cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 1)
+                cv2.putText(background, termite.number, termite.trail[frame_number], 2, color=termite.color,
+                            fontScale=0.3)
             cv2.imshow('Arena', np.hstack((frame, background)))
             cv2.waitKey(1)
             frame_number += 1
