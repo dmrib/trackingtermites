@@ -59,14 +59,18 @@ class Simulation:
             frame = cv2.resize(frame, self.params['arena_size'])
             background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0], 3), np.uint8)
             for termite in self.termites:
-                cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 1)
+                cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 3)
                 cv2.putText(background, termite.number, termite.trail[frame_number], 2, color=termite.color,
                             fontScale=0.3)
+                head = (termite.trail[frame_number+10][0],termite.trail[frame_number+10][1])
+                cv2.circle(background, head, 8, termite.color, 1)
                 for step in termite.trail[max(0, frame_number-self.params['trail_size']):frame_number]:
                     cv2.circle(background, step, 1, termite.color, -1)
 
             cv2.imshow('Arena', np.hstack((frame, background)))
-            cv2.waitKey(1)
+            pressed_key = cv2.waitKey(1) & 0xff
+            if pressed_key == ord('p'):
+                cv2.waitKey(0)
             frame_number += 1
             playing, frame = original_video.read()
 
