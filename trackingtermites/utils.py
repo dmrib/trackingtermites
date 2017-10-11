@@ -30,7 +30,7 @@ def read_config_file(config_path):
                     values = []
                     for field in value.strip().split(','):
                         if field != 'None':
-                            filters.append(field)
+                            values.append(field)
                     parameters[param] = values
                 elif param in integer_parameters:
                     parameters[param] = int(value)
