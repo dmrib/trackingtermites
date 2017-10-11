@@ -1,3 +1,7 @@
+# Configuration files
+config
+
+# Data files
 data/
 
 # Byte-compiled / optimized / DLL files
