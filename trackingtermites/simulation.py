@@ -4,6 +4,7 @@
 import cv2
 import glob
 import numpy as np
+import sys
 
 import termites as trmt
 import utils
@@ -25,7 +26,7 @@ class Simulation:
             None.
         '''
         self.load_termites(self.params['source_files_path'])
-        self.simulate()
+        self.simulate(self.params['original_source'])
 
     def load_termites(self, files_path):
         '''Load termite tracking experiment data.
@@ -39,20 +40,30 @@ class Simulation:
         for source in source_files:
             self.termites.append(trmt.TermiteRecord(source))
 
-    def simulate(self):
+    def simulate(self, original_source):
         '''Displays termite trail recorded points at a black arena.
 
         Args:
-            None.
+            original_source (str): original video path.
         Returns:
             None.
         '''
-        for step in range(len(self.termites[0].trail)):
+        original_video = cv2.VideoCapture(original_source)
+        if not original_video.isOpened():
+            print("Couldn't open the original video.")
+            sys.exit()
+
+        frame_number = 0
+        playing, frame = original_video.read()
+        while playing:
+            frame = cv2.resize(frame, self.params['arena_size'])
             background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0], 3), np.uint8)
             for termite in self.termites:
-                cv2.circle(background, termite.trail[step], self.params['termite_radius'], termite.color, -1)
-            cv2.imshow('Arena', background)
+                cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 1)
+            cv2.imshow('Arena', np.hstack((frame, background)))
             cv2.waitKey(1)
+            frame_number += 1
+            playing, frame = original_video.read()
 
         cv2.destroyAllWindows()
 

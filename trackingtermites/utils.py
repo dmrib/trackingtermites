@@ -2,7 +2,7 @@
 
 boolean_parameters = ['show_labels', 'highlight_collisions',
                       'show_bounding_box', 'show_frame_info',
-                      'show_d_lines', 'show_trails']
+                      'show_d_lines', 'show_trails', 'draw_petri']
 
 tuple_parameters = ['video_source_size', 'arena_size']
 
