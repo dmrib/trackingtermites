@@ -28,7 +28,8 @@ class GeneralTracker:
                                               self.params['output_path'],
                                               self.params['video_source_size'],
                                               self.params['filters'], True,
-                                              self.params['subtractor'])
+                                              self.params['subtractor'],
+                                              self.params['start_at'])
         self.current_speed = 1
 
     def run(self):
@@ -239,6 +240,7 @@ class GeneralTracker:
         header = ''
         header += '# Date: {}\n'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         header += '# Movie name: {}\n'.format(self.params['video_source'].split('/')[-1])
+        header += '# Experiment starts at frame: {}\n'.format(self.params['start_at'])
         header += '# Movie shape(w,h): {} x {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
         header += '# Movie scale(px to cm): {}\n'.format(self.params['scale'])
         header += '# Movie fps: {}\n'.format(int(self.video_source.fps))

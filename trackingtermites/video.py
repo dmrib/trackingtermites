@@ -6,7 +6,7 @@ import cv2
 
 class VideoPlayer:
     """A FSM for video input control."""
-    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info, subtractor):
+    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info, subtractor, start_at):
         """Initializer.
 
         Args:
@@ -16,6 +16,7 @@ class VideoPlayer:
             filters (list): list of filter's names to apply in video source.
             write_info (bool): should write frame info when displaying.
             subtractor (str): name of background subtractor.
+            start_at (int): starting frame number.
         Returns:
             None.
         """
@@ -25,6 +26,9 @@ class VideoPlayer:
         if not self.source.isOpened:
             print('Could not find video file.')
             sys.exit()
+
+        if start_at != 0:
+            self.source.set(cv2.CAP_PROP_POS_FRAMES, start_at - 1)
 
         if subtractor == 'MOG':
             self.subtractor = cv2.createBackgroundSubtractorMOG2()
