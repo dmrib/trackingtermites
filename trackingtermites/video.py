@@ -99,7 +99,7 @@ class VideoPlayer:
         Returns:
             None.
         """
-        target_frame = max(1, self.current_frame_number - step_size)
+        target_frame = max(2, self.current_frame_number - step_size)
         self.source.set(cv2.CAP_PROP_POS_FRAMES, target_frame-1)
 
     def write_to_out_video(self):

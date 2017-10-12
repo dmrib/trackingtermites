@@ -195,11 +195,6 @@ class GeneralTracker:
 
             new_region = (termite.path[-1][0], termite.path[-1][1], self.params['box_size'],
                           self.params['box_size'])
-            del termite.path[0]
-            if termite.encountering_with:
-                del termite.encountering_with[0]
-            if termite.distances:
-                del termite.distances[0]
 
             termite.tracker = cv2.Tracker_create(self.params['method'])
             termite.tracker.init(self.video_source.current_frame, new_region)
