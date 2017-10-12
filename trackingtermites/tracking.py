@@ -91,7 +91,13 @@ class GeneralTracker:
                 self.decrease_current_speed()
             elif pressed_key == ord('.'):
                 self.increase_current_speed()
+            elif pressed_key == ord('w'):
+                self.video_source.previous_frame(self.params['r_step_size'])
+                self.rewind_trackers(self.params['r_step_size'])
 
+            if self.video_source.current_frame_number == 200:
+                self.write_output()
+                sys.exit()
             self.video_source.next_frame()
 
         self.write_output()
@@ -175,6 +181,31 @@ class GeneralTracker:
                       self.params['box_size'])
         termite.tracker = cv2.Tracker_create(self.params['method'])
         termite.tracker.init(self.video_source.current_frame, new_region)
+
+    def rewind_trackers(self, rewind_step_size):
+        """Rewind tracker output data for a number of steps.
+
+        Args:
+            rewind_step_size (int): rewind step size.
+        Returns:
+            None.
+        """
+        for termite in self.termites:
+            last_valid_coord = max(1, len(termite.path) - rewind_step_size)
+            termite.path = termite.path[:last_valid_coord]
+            termite.encountering_with = termite.encountering_with[:last_valid_coord]
+            termite.distances = termite.distances[:last_valid_coord]
+
+            new_region = (termite.path[-1][0], termite.path[-1][1], self.params['box_size'],
+                          self.params['box_size'])
+            del termite.path[0]
+            if termite.encountering_with:
+                del termite.encountering_with[0]
+            if termite.distances:
+                del termite.distances[0]
+
+            termite.tracker = cv2.Tracker_create(self.params['method'])
+            termite.tracker.init(self.video_source.current_frame, new_region)
 
     def decrease_current_speed(self):
         """Decrease tracker video output speed.

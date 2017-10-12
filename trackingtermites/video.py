@@ -91,6 +91,17 @@ class VideoPlayer:
             if self.write_capture_info:
                 self.write_info()
 
+    def previous_frame(self, step_size):
+        """Rewind the video for a given number of frames.
+
+        Args:
+            step_size (int): number of frames rewinded.
+        Returns:
+            None.
+        """
+        target_frame = max(1, self.current_frame_number - step_size)
+        self.source.set(cv2.CAP_PROP_POS_FRAMES, target_frame-1)
+
     def write_to_out_video(self):
         """Write current frame to output video file.
 
