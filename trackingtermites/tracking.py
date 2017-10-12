@@ -95,9 +95,6 @@ class GeneralTracker:
                 self.video_source.previous_frame(self.params['r_step_size'])
                 self.rewind_trackers(self.params['r_step_size'])
 
-            if self.video_source.current_frame_number == 200:
-                self.write_output()
-                sys.exit()
             self.video_source.next_frame()
 
         self.write_output()
