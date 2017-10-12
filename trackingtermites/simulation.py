@@ -65,6 +65,7 @@ class Simulation:
                 for step in termite.trail[max(0, frame_number-self.params['trail_size']):frame_number]:
                     cv2.circle(background, step, 1, termite.color, -1)
 
+            background = cv2.resize(background, self.params['arena_size'])
             cv2.imshow('Movement Simulation', np.hstack((frame, background)))
             pressed_key = cv2.waitKey(1) & 0xff
             if pressed_key == ord('p'):
