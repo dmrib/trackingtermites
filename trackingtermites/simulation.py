@@ -15,7 +15,7 @@ class Simulation:
     def __init__(self, config_path):
         self.termites = []
         self.params = utils.read_config_file(config_path)
-        self.current_speed = 1
+        self.simulation_speed = self.params['simulation_speed']
 
     def run(self):
         '''Start simulation.
@@ -67,7 +67,7 @@ class Simulation:
 
             background = cv2.resize(background, self.params['arena_size'])
             cv2.imshow('Movement Simulation', np.hstack((frame, background)))
-            pressed_key = cv2.waitKey(1) & 0xff
+            pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
             if pressed_key == ord('p'):
                 cv2.waitKey(0)
             frame_number += 1
