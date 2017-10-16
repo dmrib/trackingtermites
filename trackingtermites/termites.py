@@ -136,6 +136,9 @@ class TermiteRecord:
                     self.color = (int(b.lstrip('(').rstrip(',')),
                                   int(g.rstrip(',')),
                                   int(r.rstrip(')')))
+                elif 'starts' in line:
+                    _, _, _, _, _, starts_at = line.split()
+                    self.starts_at = int(starts_at)
                 else:
                     if not line.startswith('#') and not line.startswith('frame') and not line == '\n':
                         line_values = line.split()
