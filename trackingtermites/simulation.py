@@ -8,6 +8,7 @@ import sys
 
 import termites as trmt
 import utils
+import video
 
 
 class Simulation:
@@ -26,7 +27,7 @@ class Simulation:
             None.
         '''
         self.load_termites(self.params['source_files_path'])
-        self.simulate(self.params['original_source'])
+        self.simulate()
 
     def load_termites(self, files_path):
         '''Load termite tracking experiment data.
@@ -40,38 +41,33 @@ class Simulation:
         for source in source_files:
             self.termites.append(trmt.TermiteRecord(source))
 
-    def simulate(self, original_source):
+    def simulate(self):
         '''Displays termite trail recorded points at a black arena.
 
         Args:
-            original_source (str): original video path.
+            None.
         Returns:
             None.
         '''
-        original_video = cv2.VideoCapture(original_source)
-        if not original_video.isOpened():
-            print("Couldn't open the original video.")
-            sys.exit()
-
-        frame_number = 0
-        playing, frame = original_video.read()
-        while playing:
-            frame = cv2.resize(frame, self.params['arena_size'])
+        video_source = video.VideoPlayer(self.params['original_source'], self.params['out_path'], self.params['arena_size'], [], True, 'MOG', 100)
+        simulation_length = max(len(x.trail) for x in self.termites)
+        current_step = 0
+        while current_step < simulation_length:
+            video_source.next_frame()
             background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0], 3), np.uint8)
             for termite in self.termites:
-                cv2.circle(background, termite.trail[frame_number], self.params['termite_radius'], termite.color, 3)
-                cv2.putText(background, termite.number, termite.trail[frame_number], 2, color=termite.color,
-                            fontScale=0.3)
-                for step in termite.trail[max(0, frame_number-self.params['trail_size']):frame_number]:
+                cv2.circle(background, termite.trail[current_step], self.params['termite_radius'], termite.color, 1)
+                cv2.putText(background, termite.number, (termite.trail[current_step][0]-4, termite.trail[current_step][1]-self.params['termite_radius']-5), 2, color=termite.color,
+                            fontScale=0.4)
+                for step in termite.trail[max(0, current_step-self.params['trail_size']):current_step]:
                     cv2.circle(background, step, 1, termite.color, -1)
 
             background = cv2.resize(background, self.params['arena_size'])
-            cv2.imshow('Movement Simulation', np.hstack((frame, background)))
+            cv2.imshow('Movement Simulation', np.hstack((video_source.current_frame, background)))
             pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
             if pressed_key == ord('p'):
                 cv2.waitKey(0)
-            frame_number += 1
-            playing, frame = original_video.read()
+            current_step += 1
 
         cv2.destroyAllWindows()
 
