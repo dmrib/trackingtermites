@@ -27,8 +27,10 @@ class VideoPlayer:
             print('Could not find video file.')
             sys.exit()
 
+        self.start_at = start_at
         if start_at != 0:
-            self.source.set(cv2.CAP_PROP_POS_FRAMES, start_at - 1)
+            self.start_at = start_at - 1
+            self.source.set(cv2.CAP_PROP_POS_FRAMES, self.start_at)
 
         if subtractor == 'MOG':
             self.subtractor = cv2.createBackgroundSubtractorMOG2()
@@ -99,7 +101,7 @@ class VideoPlayer:
         Returns:
             None.
         """
-        target_frame = max(0, self.current_frame_number - step_size)
+        target_frame = max(self.start_at, self.current_frame_number - step_size)
         self.source.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
 
     def write_to_out_video(self):
