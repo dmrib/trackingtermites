@@ -51,25 +51,45 @@ class Simulation:
         '''
         video_source = video.VideoPlayer(self.params['original_source'], self.params['out_path'], self.params['arena_size'], [], True, 'MOG', 100)
         simulation_length = max(len(x.trail) for x in self.termites)
-        current_step = 0
-        while current_step < simulation_length:
+        self.current_step = 0
+        while self.current_step < simulation_length:
             video_source.next_frame()
-            background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0], 3), np.uint8)
-            for termite in self.termites:
-                cv2.circle(background, termite.trail[current_step], self.params['termite_radius'], termite.color, 1)
-                cv2.putText(background, termite.number, (termite.trail[current_step][0]-4, termite.trail[current_step][1]-self.params['termite_radius']-5), 2, color=termite.color,
-                            fontScale=0.4)
-                for step in termite.trail[max(0, current_step-self.params['trail_size']):current_step]:
-                    cv2.circle(background, step, 1, termite.color, -1)
-
-            background = cv2.resize(background, self.params['arena_size'])
-            cv2.imshow('Movement Simulation', np.hstack((video_source.current_frame, background)))
+            self.background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0], 3), np.uint8)
+            self.draw_termites()
+            self.draw_trails()
+            self.background = cv2.resize(self.background, self.params['arena_size'])
+            cv2.imshow('Movement Simulation', np.hstack((video_source.current_frame, self.background)))
             pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
             if pressed_key == ord('p'):
                 cv2.waitKey(0)
-            current_step += 1
+            self.current_step += 1
 
         cv2.destroyAllWindows()
+
+    def draw_termites(self):
+        '''Draw termites on simulation.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for termite in self.termites:
+            cv2.circle(self.background, termite.trail[self.current_step], self.params['termite_radius'], termite.color, 1)
+            cv2.putText(self.background, termite.number, (termite.trail[self.current_step][0]-4, termite.trail[self.current_step][1]-self.params['termite_radius']-5), 2, color=termite.color,
+                        fontScale=0.4)
+
+    def draw_trails(self):
+        '''Draw termites' trails on simulation.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for termite in self.termites:
+            for step in termite.trail[max(0, self.current_step-self.params['trail_size']):self.current_step]:
+                cv2.circle(self.background, step, 1, termite.color, -1)
 
 if __name__ == '__main__':
     sim = Simulation('../config/simulation.conf')
