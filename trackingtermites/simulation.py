@@ -12,43 +12,43 @@ import video
 
 
 class Simulation:
-    '''Abstraction for termite movement simulation experiment.'''
+    """Abstraction for termite movement simulation experiment."""
     def __init__(self, config_path):
         self.termites = []
         self.params = utils.read_config_file(config_path)
         self.simulation_speed = self.params['simulation_speed']
 
     def run(self):
-        '''Start simulation.
+        """Start simulation.
 
         Args:
             None.
         Returns:
             None.
-        '''
+        """
         self.load_termites(self.params['source_files_path'])
         self.simulate()
 
     def load_termites(self, files_path):
-        '''Load termite tracking experiment data.
+        """Load termite tracking experiment data.
 
         Args:
             files_path (str): path to input files.
         Returns:
             None.
-        '''
+        """
         source_files = glob.glob(files_path + '*termite*')
         for source in source_files:
             self.termites.append(trmt.TermiteRecord(source))
 
     def simulate(self):
-        '''Displays termite trail recorded points at a black arena.
+        """Displays termite trail recorded points at a black arena.
 
         Args:
             None.
         Returns:
             None.
-        '''
+        """
         self.video_source = video.VideoPlayer(self.params['original_video_path'], self.params['output_path'],
                                          self.params['arena_size'], [], True, 'MOG')
         simulation_length = min(len(x.trail) for x in self.termites)
@@ -77,13 +77,13 @@ class Simulation:
         self.draw_trails()
 
     def draw_termites(self):
-        '''Draw termites on simulation.
+        """Draw termites on simulation.
 
         Args:
             None.
         Returns:
             None.
-        '''
+        """
         for termite in self.termites:
             cv2.circle(self.background, termite.trail[self.current_step],
                        self.params['termite_radius'], termite.color, 1)
@@ -92,13 +92,13 @@ class Simulation:
                         color=termite.color, fontScale=0.4)
 
     def draw_trails(self):
-        '''Draw termites' trails on simulation.
+        """Draw termites' trails on simulation.
 
         Args:
             None.
         Returns:
             None.
-        '''
+        """
         for termite in self.termites:
             for step in termite.trail[max(0, self.current_step - self.params['trail_size']) : self.current_step]:
                 cv2.circle(self.background, step, 1, termite.color, -1)
