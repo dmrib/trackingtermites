@@ -26,7 +26,7 @@ class Simulation:
         Returns:
             None.
         '''
-        self.load_termites(self.params['trail_files_path'])
+        self.load_termites(self.params['source_files_path'])
         self.simulate()
 
     def load_termites(self, files_path):
@@ -49,11 +49,10 @@ class Simulation:
         Returns:
             None.
         '''
-        video_source = video.VideoPlayer(self.params['video_source_path'], self.params['output_path'],
-                                         self.params['arena_size'], [], True, 'MOG',
-                                         self.termites[0].starts_at)
-        simulation_length = max(len(x.trail) for x in self.termites)
-        self.current_step = 0
+        video_source = video.VideoPlayer(self.params['original_video_path'], self.params['output_path'],
+                                         self.params['arena_size'], [], True, 'MOG')
+        simulation_length = min(len(x.trail) for x in self.termites)
+        self.current_step = 1
 
         while self.current_step < simulation_length:
             video_source.next_frame()

@@ -35,7 +35,7 @@ class Termite:
         return (int(self.position[0] + self.position[2]),
                 int(self.position[1] + self.position[3]))
 
-    def detect_encounters(self, others):
+    def detect_box_encounters(self, others):
         """Update termite encounters.
 
         Args:

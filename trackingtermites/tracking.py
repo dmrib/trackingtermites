@@ -104,13 +104,12 @@ class GeneralTracker:
         Returns:
             None.
         """
-        print(self.video_source.current_frame_number)
         for termite in self.termites:
             found, termite.position = termite.tracker.update(self.video_source.current_frame)
             if not found:
                 print('Lost termite no.{}'.format(termite.identity))
                 self.video_source.pause()
-            termite.detect_encounters(self.termites)
+            termite.detect_box_encounters(self.termites)
             termite.compute_distances(self.termites, self.params['scale'])
             termite.path.append([int(termite.position[0]), int(termite.position[1]),
                                 termite.encountering_with, termite.distances,
