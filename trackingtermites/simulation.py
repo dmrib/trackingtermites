@@ -49,26 +49,32 @@ class Simulation:
         Returns:
             None.
         '''
-        video_source = video.VideoPlayer(self.params['original_video_path'], self.params['output_path'],
+        self.video_source = video.VideoPlayer(self.params['original_video_path'], self.params['output_path'],
                                          self.params['arena_size'], [], True, 'MOG')
         simulation_length = min(len(x.trail) for x in self.termites)
-        self.current_step = 1
+        self.current_step = 0
 
         while self.current_step < simulation_length:
-            video_source.next_frame()
-
             self.background = np.zeros((self.params['arena_size'][1], self.params['arena_size'][0],
                                         3), np.uint8)
-            self.draw_termites()
-            self.draw_trails()
+            self.draw()
+            self.show()
 
-            cv2.imshow('Movement Simulation', np.hstack((video_source.current_frame, self.background)))
-            pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
-            if pressed_key == ord('p'):
-                cv2.waitKey(0)
             self.current_step += 1
+            self.video_source.next_frame()
 
         cv2.destroyAllWindows()
+
+    def draw(self):
+        """Draw objects to simulation backgroud.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        self.draw_termites()
+        self.draw_trails()
 
     def draw_termites(self):
         '''Draw termites on simulation.
@@ -96,6 +102,19 @@ class Simulation:
         for termite in self.termites:
             for step in termite.trail[max(0, self.current_step - self.params['trail_size']) : self.current_step]:
                 cv2.circle(self.background, step, 1, termite.color, -1)
+
+    def show(self):
+        """Display simulation progress.
+
+        Args:
+            None.
+        Returns:
+            None.
+        """
+        cv2.imshow('Movement Simulation', np.hstack((self.video_source.current_frame, self.background)))
+        pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
+        if pressed_key == ord('p'):
+            cv2.waitKey(0)
 
 if __name__ == '__main__':
     sim = Simulation('../config/simulation.conf')
