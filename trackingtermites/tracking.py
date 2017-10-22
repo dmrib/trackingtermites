@@ -60,7 +60,6 @@ class GeneralTracker:
             termite.tracker.init(self.video_source.current_frame, starting_box)
 
             self.termites.append(termite)
-        self.update_termites()
 
     def track_all(self):
         """Start tracking loop.
@@ -105,6 +104,7 @@ class GeneralTracker:
         Returns:
             None.
         """
+        print(self.video_source.current_frame_number)
         for termite in self.termites:
             found, termite.position = termite.tracker.update(self.video_source.current_frame)
             if not found:
@@ -186,10 +186,10 @@ class GeneralTracker:
             None.
         """
         for termite in self.termites:
-            last_valid_coord = max(1, len(termite.path) - rewind_step_size)
-            termite.path = termite.path[:last_valid_coord]
-            termite.encountering_with = termite.encountering_with[:last_valid_coord]
-            termite.distances = termite.distances[:last_valid_coord]
+            valid_coord_thresh = max(1, len(termite.path) - rewind_step_size)
+            termite.path = termite.path[:valid_coord_thresh]
+            termite.encountering_with = termite.encountering_with[:valid_coord_thresh]
+            termite.distances = termite.distances[:valid_coord_thresh]
 
             new_region = (termite.path[-1][0], termite.path[-1][1], self.params['box_size'],
                           self.params['box_size'])
