@@ -2,6 +2,7 @@
 
 import random
 import math
+import time
 
 
 class Termite:
@@ -11,7 +12,7 @@ class Termite:
 
         Args:
             identity (int): termite identity on video
-            starting_point (tuple): y and x values for termite starting point.
+            starting_point (tuple): x and y values for termite starting point.
             box_size (int): bounding box size.
         Returns:
             None.
@@ -35,41 +36,6 @@ class Termite:
         return (int(self.position[0] + self.position[2]),
                 int(self.position[1] + self.position[3]))
 
-    def detect_box_encounters(self, others):
-        """Update termite encounters.
-
-        Args:
-            others (list): termites to be compared.
-        Returns:
-            None.
-        """
-        encountering_with = []
-        for other in others:
-            if other.identity != self.identity:
-                if (self.position[0] < other.position[0] + self.box_size and
-                    self.position[0] + self.box_size > other.position[0] and
-                    self.position[1] < other.position[1] + self.box_size and
-                    self.box_size + self.position[1] > other.position[1]):
-                    encountering_with.append(other.identity)
-        self.encountering_with = encountering_with
-
-    def compute_distances(self, others, scale):
-        """Compute the distace between the termite and the other samples.
-
-        Args:
-            others (list): termites to be compared.
-            scale (float): distance of 1cm in pixels.
-        Returns:
-            None.
-        """
-        distances = []
-        for other in others:
-            origin = math.pow(int((self.position[0] - other.position[0])),2)
-            destination = math.pow(int((self.position[1] - other.position[1])),2)
-            distance = round(math.sqrt(origin + destination) / scale, 2)
-            distances.append(distance)
-        self.distances = distances
-
     def generate_output(self, frame_number_dimension):
         """Create output string for a termite.
 
@@ -82,10 +48,10 @@ class Termite:
         output += '# Termite number: {}\n'.format(self.identity)
         output += '# Color: {}\n\n'.format(self.color)
         output += ('###\n\n')
-        output += ('frame, x, y, colliding, distances\n')
+        output += ('frame,time,x,y\n')
         for frame, location in enumerate(self.path):
             n_frame = str(frame+1).zfill(len(str(int(frame_number_dimension))))
-            output += 'f{}, {}, {}, {}, {}\n'.format(n_frame, location[0], location[1], location[2], location[3])
+            output += 'f{},{},{},{}\n'.format(n_frame, time.strftime("%H:%M:%S", time.gmtime(int(location[2])/1000)), location[0], location[1])
 
         return output
 

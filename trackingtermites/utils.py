@@ -1,12 +1,11 @@
 """Utilitary shared functions."""
 
-boolean_parameters = ['show_labels', 'highlight_collisions',
-                      'show_bounding_box', 'show_frame_info',
-                      'show_d_lines', 'show_trails', 'draw_petri']
+boolean_parameters = ['show_labels', 'show_bounding_box', 'show_frame_info',
+                      'show_trails', 'draw_petri']
 
 tuple_parameters = ['video_source_size', 'arena_size']
 
-integer_parameters = ['n_termites', 'box_size', 'scale', 'trail_size', 'termite_radius',
+integer_parameters = ['n_termites', 'box_size', 'trail_size', 'termite_radius',
                       'r_step_size', 'simulation_speed']
 
 list_parameters = ['filters']
