@@ -19,6 +19,9 @@ class Simulation:
         self.termites = []
         self.params = utils.read_config_file(config_path)
         self.simulation_speed = self.params['simulation_speed']
+        self.out = cv2.VideoWriter('{}simulation-out.avi'.format(self.params['output_path']),
+                                   cv2.VideoWriter_fourcc(*'XVID'), 30.0,
+                                   (1280,480))
 
     def run(self):
         """Start simulation.
@@ -113,6 +116,7 @@ class Simulation:
         Returns:
             None.
         """
+        self.out.write(np.hstack((self.video_source.current_frame, self.background)))
         cv2.imshow('Movement Simulation', np.hstack((self.video_source.current_frame, self.background)))
         pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
         if pressed_key == ord('p'):
