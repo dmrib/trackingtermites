@@ -91,8 +91,17 @@ class Simulation:
         """
         for termite in self.termites:
             cv2.circle(self.background, termite.trail[self.current_step],
-                       self.params['termite_radius'], termite.color, 1)
+                       self.params['termite_radius'], termite.color, 2)
+            cv2.circle(self.background, termite.trail[self.current_step],
+                       2, termite.color, -1)
             cv2.putText(self.background, termite.number, (termite.trail[self.current_step][0] - 4,
+                        termite.trail[self.current_step][1] - self.params['termite_radius'] - 5), 2,
+                        color=termite.color, fontScale=0.4)
+            cv2.circle(self.video_source.current_frame, termite.trail[self.current_step],
+                       self.params['termite_radius'], termite.color, 2)
+            cv2.circle(self.video_source.current_frame, termite.trail[self.current_step],
+                       2, termite.color, -1)
+            cv2.putText(self.video_source.current_frame, termite.number, (termite.trail[self.current_step][0] - 4,
                         termite.trail[self.current_step][1] - self.params['termite_radius'] - 5), 2,
                         color=termite.color, fontScale=0.4)
 
@@ -121,6 +130,8 @@ class Simulation:
         pressed_key = cv2.waitKey(self.params['simulation_speed']) & 0xff
         if pressed_key == ord('p'):
             cv2.waitKey(0)
+        if pressed_key == 27:                                   # being pressed.
+            sys.exit()
 
 if __name__ == '__main__':
     sim = Simulation('../config/simulation.conf')

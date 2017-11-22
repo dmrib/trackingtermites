@@ -27,8 +27,7 @@ class GeneralTracker:
         self.video_source = video.VideoPlayer(self.params['video_source'],
                                               self.params['output_path'],
                                               self.params['video_source_size'],
-                                              self.params['filters'], True,
-                                              self.params['subtractor'])
+                                              [], True)
         self.current_speed = 1
 
     def run(self):
@@ -127,7 +126,7 @@ class GeneralTracker:
             if self.params['show_bounding_box']:
                 self.video_source.draw_b_box(termite.origin, termite.end,
                                              termite.color)
-            if self.params['show_trails'] and self.params['trail_size'] != 0:
+            if self.params['trail_size'] != 0:
                 for step in termite.path[-self.params['trail_size']:]:
                     self.video_source.draw_step((step[0], step[1]),
                                                 termite.color)
@@ -238,7 +237,6 @@ class GeneralTracker:
         header += '# Movie name: {}\n'.format(self.params['video_source'].split('/')[-1])
         header += '# Movie shape(w,h): {} x {}\n'.format(self.params['video_source_size'][0], self.params['video_source_size'][1])
         header += '# Movie fps: {}\n'.format(int(self.video_source.fps))
-        header += '# Filters: {}\n'.format(self.params['filters'])
         header += '# Bounding box size: {}\n'.format(self.params['box_size'])
 
         return header

@@ -6,7 +6,7 @@ import cv2
 
 class VideoPlayer:
     """A FSM for video input control."""
-    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info, subtractor):
+    def __init__(self, video_path, out_path, video_shape, filters, write_capture_info, subtractor='MOG'):
         """Initializer.
 
         Args:
@@ -166,7 +166,7 @@ class VideoPlayer:
             None.
         """
         cv2.putText(self.current_frame,
-                    '#{:.0f} of {:.0f}, {:.0f}fps.'.format(self.current_frame_number,
+                    'Frame #{:.0f} of {:.0f}'.format(self.current_frame_number,
                     self.number_of_frames, self.fps), (10,10), 1, color=(0, 0, 255),
                     fontScale=0.7)
 
