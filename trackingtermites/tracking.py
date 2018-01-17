@@ -108,7 +108,8 @@ class GeneralTracker:
             if not found:
                 print('Lost termite no.{}'.format(termite.identity))
                 self.video_source.pause()
-            termite.path.append([int(termite.position[0]), int(termite.position[1]),
+            centered = int(termite.position[0]+termite.box_size/2), int(termite.position[1]+termite.box_size/2)
+            termite.path.append([centered[0], centered[1],
                                 self.video_source.source.get(cv2.CAP_PROP_POS_MSEC)])
 
     def draw(self):
