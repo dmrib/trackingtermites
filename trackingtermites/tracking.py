@@ -174,7 +174,7 @@ class GeneralTracker:
             valid_coord_thresh = max(1, len(termite.path) - rewind_step_size)
             termite.path = termite.path[:valid_coord_thresh]
 
-            new_region = (termite.path[-1][0], termite.path[-1][1], self.params['box_size'],
+            new_region = (termite.path[-1][0]-termite.box_size/2, termite.path[-1][1]-termite.box_size/2, self.params['box_size'],
                           self.params['box_size'])
 
             termite.tracker = cv2.Tracker_create(self.params['method'])
