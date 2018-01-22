@@ -35,8 +35,9 @@ class VideoPlayer:
         self.playing = False
         self.video_shape = video_shape
         self.codec = cv2.VideoWriter_fourcc(*'XVID')
-        self.out = cv2.VideoWriter('{}tracking-out.avi'.format(out_path),
-                                   self.codec, 30.0, self.video_shape)
+        if out_path != None:
+            self.out = cv2.VideoWriter('{}tracking-out.avi'.format(out_path),
+                                       self.codec, 30.0, self.video_shape)
         self.filters = filters
         self.write_capture_info = write_capture_info
         self.start()

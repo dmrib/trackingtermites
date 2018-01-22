@@ -54,7 +54,7 @@ class Simulation:
         Returns:
             None.
         """
-        self.video_source = video.VideoPlayer(self.params['original_video_path'], self.params['output_path'],
+        self.video_source = video.VideoPlayer(self.params['original_video_path'], None,
                                          self.params['arena_size'], [], True, 'MOG')
         simulation_length = min(len(x.trail) for x in self.termites)
         self.current_step = 0
