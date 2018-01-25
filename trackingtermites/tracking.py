@@ -57,8 +57,8 @@ def track(video_path, n_termites):
                 termite.trail.append(Record(int(video.get(cv2.CAP_PROP_POS_FRAMES)),
                                      time.strftime("%H:%M:%S",
                                      time.gmtime(int(video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                     int(termite_pos[0]),
-                                     int(termite_pos[1])))
+                                     (termite_pos[0]+termite_pos[2])//2,
+                                     (termite_pos[1]+termite_pos[3])//2))
 
             # Draw termites' bounding boxes on current frame
             origin = (int(termite_pos[0]), int(termite_pos[1]))
