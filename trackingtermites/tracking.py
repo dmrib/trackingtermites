@@ -75,7 +75,7 @@ def track(video_path, n_termites):
 
         # Show current frame
         cv2.imshow('Tracking...', frame)
-        pressed_key = cv2.waitKey(0) & 0xff
+        pressed_key = cv2.waitKey(1) & 0xff
         if pressed_key == 27:
             break
 
@@ -84,4 +84,7 @@ def track(video_path, n_termites):
 
 
 if __name__ == '__main__':
-    track('D:/Og-footage/00100.MTS', 1)
+    #track('D:/Og-footage/00100.MTS', 1)
+    #track('D:/Og-footage/00100.MTS', 8)
+    track('D:/Og-footage/sample.MP4', 1)
+    #track('D:/Og-footage/sample.MP4', 8)
