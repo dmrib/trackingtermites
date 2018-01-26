@@ -5,7 +5,7 @@ import sys
 import termite as trmt
 import time
 
-Record = namedtuple('Record', ['frame', 'time', 'x', 'y'])
+Record = namedtuple('Record', ['frame', 'time', 'x', 'y', 'xoffset', 'yoffset'])
 
 def track(video_path, n_termites):
     termites = []
@@ -35,8 +35,9 @@ def track(video_path, n_termites):
         termite.trail.append(Record(int(video.get(cv2.CAP_PROP_POS_FRAMES)),
                              time.strftime("%H:%M:%S",
                              time.gmtime(int(video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                             int((termite_pos[0]+termite_pos[2])//2),
-                             int((termite_pos[1]+termite_pos[3])//2)))
+                             termite_pos[0], termite_pos[1], termite_pos[2],
+                             termite_pos[3]))
+
         termite.tracker.init(frame, termite_pos)
         cv2.destroyWindow('Select the termite...')
         termites.append(termite)
@@ -58,8 +59,8 @@ def track(video_path, n_termites):
                 termite.trail.append(Record(int(video.get(cv2.CAP_PROP_POS_FRAMES)),
                                      time.strftime("%H:%M:%S",
                                      time.gmtime(int(video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                     int((termite_pos[0]+termite_pos[2])//2),
-                                     int((termite_pos[1]+termite_pos[3])//2)))
+                                     termite_pos[0], termite_pos[1],
+                                     termite_pos[2], termite_pos[3]))
 
             # Draw termites' bounding boxes on current frame
             origin = (int(termite_pos[0]), int(termite_pos[1]))
@@ -91,6 +92,16 @@ def track(video_path, n_termites):
             cv2.destroyWindow('Select the termite...')
             termites[correct-1].tracker = cv2.Tracker_create('KCF')
             termites[correct-1].tracker.init(frame, new_position)
+        elif pressed_key == ord('w'):
+            for termite in termites:
+                termite.trail = termite.trail[:max(1, len(termite.trail)-15)]
+                termite.tracker = cv2.Tracker_create('KCF')
+                termite.tracker.init(frame, (termite.trail[-1].x,
+                                     termite.trail[-1].y,
+                                     termite.trail[-1].xoffset,
+                                     termite.trail[-1].yoffset))
+            video.set(cv2.CAP_PROP_POS_FRAMES,
+                      max(1, video.get(cv2.CAP_PROP_POS_FRAMES) - 15))
 
     for termite in termites:
         termite.to_csv()
