@@ -35,8 +35,8 @@ def track(video_path, n_termites):
         termite.trail.append(Record(int(video.get(cv2.CAP_PROP_POS_FRAMES)),
                              time.strftime("%H:%M:%S",
                              time.gmtime(int(video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                             int(termite_pos[0]),
-                             int(termite_pos[1])))
+                             int((termite_pos[0]+termite_pos[2])//2),
+                             int((termite_pos[1]+termite_pos[3])//2)))
         termite.tracker.init(frame, termite_pos)
         cv2.destroyWindow('Select the termite...')
         termites.append(termite)
@@ -58,8 +58,8 @@ def track(video_path, n_termites):
                 termite.trail.append(Record(int(video.get(cv2.CAP_PROP_POS_FRAMES)),
                                      time.strftime("%H:%M:%S",
                                      time.gmtime(int(video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                     (termite_pos[0]+termite_pos[2])//2,
-                                     (termite_pos[1]+termite_pos[3])//2))
+                                     int((termite_pos[0]+termite_pos[2])//2),
+                                     int((termite_pos[1]+termite_pos[3])//2)))
 
             # Draw termites' bounding boxes on current frame
             origin = (int(termite_pos[0]), int(termite_pos[1]))
@@ -84,6 +84,13 @@ def track(video_path, n_termites):
             speed = max(1, speed - 10)
         elif pressed_key == ord(','):
             speed += 10
+        elif pressed_key == ord('r'):
+            correct = int(input('Termite number: '))
+            new_position = cv2.selectROI('Select the termite...', frame, False,
+                                         False)
+            cv2.destroyWindow('Select the termite...')
+            termites[correct-1].tracker = cv2.Tracker_create('KCF')
+            termites[correct-1].tracker.init(frame, new_position)
 
     for termite in termites:
         termite.to_csv()
