@@ -9,6 +9,7 @@ Record = namedtuple('Record', ['frame', 'time', 'x', 'y'])
 
 def track(video_path, n_termites):
     termites = []
+    speed = 1
 
     # Open video source
     video = cv2.VideoCapture(video_path)
@@ -70,14 +71,19 @@ def track(video_path, n_termites):
 
         # Draw frame info
         cv2.putText(frame, f'Frame #{int(video.get(cv2.CAP_PROP_POS_FRAMES))}'
-                           f' of {int(video.get(cv2.CAP_PROP_FRAME_COUNT))}',
-                           (5,10), 1, color=(0, 0, 255), fontScale=0.7)
+                           f' of {int(video.get(cv2.CAP_PROP_FRAME_COUNT))}, '
+                           f'{speed}ms delay.', (5,10), 1, color=(0, 0, 255),
+                           fontScale=0.7)
 
         # Show current frame
         cv2.imshow('Tracking...', frame)
-        pressed_key = cv2.waitKey(1) & 0xff
+        pressed_key = cv2.waitKey(speed) & 0xff
         if pressed_key == 27:
             break
+        elif pressed_key == ord('.'):
+            speed = max(1, speed - 10)
+        elif pressed_key == ord(','):
+            speed += 10
 
     for termite in termites:
         termite.to_csv()
