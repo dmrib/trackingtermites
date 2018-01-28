@@ -10,7 +10,7 @@ class Termite:
 
     def to_csv(self):
         with open('data/{}-trail.csv'.format(self.label), mode='w') as trail_out:
-            trail_out.write('label,frame,time,x,y\n')
+            trail_out.write('label,frame,time,x,y,xoffset,yoffset\n')
             for record in self.trail:
                 trail_out.write('{},{},{},{},{},{},{}\n'.format(self.label,
                                 record.frame, record.time, record.x, record.y,
