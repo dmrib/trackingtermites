@@ -71,10 +71,11 @@ def track(video_path, n_termites):
                         color=termite.color, fontScale=0.3)
 
         # Draw frame info
-        cv2.putText(frame, f'Frame #{int(video.get(cv2.CAP_PROP_POS_FRAMES))}'
-                           f' of {int(video.get(cv2.CAP_PROP_FRAME_COUNT))}, '
-                           f'{speed}ms delay.', (5,10), 1, color=(0, 0, 255),
-                           fontScale=0.7)
+        cv2.putText(frame, 'Frame #{}, of {} {}ms delay.'.format(
+                    int(video.get(cv2.CAP_PROP_POS_FRAMES)),
+                    int(video.get(cv2.CAP_PROP_FRAME_COUNT)), speed),
+                    (5,10), 1,
+                    color=(0, 0, 255), fontScale=0.7)
 
         # Show current frame
         cv2.imshow('Tracking...', frame)
@@ -108,7 +109,7 @@ def track(video_path, n_termites):
 
 
 if __name__ == '__main__':
-    #track('D:/Og-footage/00100.MTS', 1)
-    #track('D:/Og-footage/00100.MTS', 8)
-    track('D:/Og-footage/sample.MP4', 1)
-    #track('D:/Og-footage/sample.MP4', 8)
+    #track('/media/dmrib/tdata/Og-footage/00100.MTS', 1)
+    #track('/media/dmrib/tdata/Og-footage/00100.MTS', 8)
+    track('/media/dmrib/tdata/Og-footage/sample.mp4', 1)
+    #track('/media/dmrib/tdata/Og-footage/sample.MP4', 8)
