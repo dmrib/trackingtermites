@@ -84,7 +84,7 @@ class TermiteTracker:
                     self.settings['movie_speed']), (5,10), 1, color=(0, 0, 255),
                     fontScale=0.7)
 
-    def process_event(self, pressed_key):
+    def _process_event(self, pressed_key):
         if pressed_key == 27:
             return False
         elif pressed_key == ord('p'):
@@ -113,6 +113,10 @@ class TermiteTracker:
 
         return True
 
+    def _write_output(self, output_path):
+        for termite in self.termites:
+            termite.to_csv(output_path)
+
     def track(self):
         self._load_video()
         self._select_termites()
@@ -131,18 +135,13 @@ class TermiteTracker:
 
             # Check and processs pressed keys events
             pressed_key = cv2.waitKey(self.settings['movie_speed']) & 0xff
-            go_on = self.process_event(pressed_key)
+            go_on = self._process_event(pressed_key)
             if not go_on:
                 break
 
-        for termite in self.termites:
-            termite.to_csv()
+        self._write_output(self.settings['output_path'])
 
 
 if __name__ == '__main__':
     tracker = TermiteTracker('settings.json')
     tracker.track()
-    #track('/media/dmrib/tdata/Og-footage/00100.MTS', 1)
-    #track('/media/dmrib/tdata/Og-footage/00142.MTS', 2)
-    #track('/media/dmrib/tdata/Og-footage/sample.mp4', 1)
-    #track('/media/dmrib/tdata/Og-footage/sample.mp4', 8)

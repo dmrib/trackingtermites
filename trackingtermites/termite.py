@@ -8,8 +8,8 @@ class Termite:
         self.trail = []
         self.tracker = None
 
-    def to_csv(self):
-        with open('data/{}-trail.csv'.format(self.label), mode='w') as trail_out:
+    def to_csv(self, output_path):
+        with open('{}{}-trail.csv'.format(output_path, self.label), mode='w') as trail_out:
             trail_out.write('label,frame,time,x,y,xoffset,yoffset\n')
             for record in self.trail:
                 trail_out.write('{},{},{},{},{},{},{}\n'.format(self.label,
