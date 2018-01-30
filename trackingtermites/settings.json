@@ -1,5 +1,6 @@
 {
     "experiment_name": "sample_experiment",
+    "tracking_method": "KCF",
     "label_prefix": "t",
     "output_path": "data/",
     "video_path": "data/sample.mp4",

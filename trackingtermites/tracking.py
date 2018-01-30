@@ -80,7 +80,7 @@ class TermiteTracker:
                             random.randint(0, 255))
             termite = trmt.Termite(self.settings['label_prefix'] + str(i),
                                    random_color)
-            termite.tracker = cv2.Tracker_create('KCF')
+            termite.tracker = cv2.Tracker_create(self.settings['tracking_method'])
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
             termite.trail.append({'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
