@@ -7,9 +7,6 @@ import termite as trmt
 import time
 
 
-Record = namedtuple('Record', ['frame', 'time', 'x', 'y', 'xoffset', 'yoffset'])
-
-
 class TermiteTracker:
     def __init__(self, settings_file_path):
         '''Initializer.
@@ -85,11 +82,13 @@ class TermiteTracker:
             termite.tracker = cv2.Tracker_create('KCF')
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
-            termite.trail.append(Record(int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
-                                 time.strftime("%H:%M:%S",
+            termite.trail.append({'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
+                                 'time': time.strftime("%H:%M:%S",
                                  time.gmtime(int(self.video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                 termite_pos[0], termite_pos[1], termite_pos[2],
-                                 termite_pos[3]))
+                                 'x': termite_pos[0],
+                                 'y': termite_pos[1],
+                                 'xoffset': termite_pos[2],
+                                 'yoffset': termite_pos[3]})
 
             termite.tracker.init(self.frame, termite_pos)
             cv2.destroyWindow('Select the termite...')
@@ -109,11 +108,13 @@ class TermiteTracker:
             if not found:
                 print('Termite lost.')
             else:
-                termite.trail.append(Record(int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
-                                     time.strftime("%H:%M:%S",
+                termite.trail.append({'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
+                                     'time': time.strftime("%H:%M:%S",
                                      time.gmtime(int(self.video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                     termite_pos[0], termite_pos[1],
-                                     termite_pos[2], termite_pos[3]))
+                                     'x': termite_pos[0],
+                                     'y': termite_pos[1],
+                                     'xoffset': termite_pos[2],
+                                     'yoffset': termite_pos[3]})
 
     def _draw_boxes(self):
         '''Draw box on current frame representing a termite current predicted
@@ -125,9 +126,9 @@ class TermiteTracker:
             None.
         '''
         for termite in self.termites:
-            origin = (int(termite.trail[-1].x), int(termite.trail[-1].y))
-            end = (int(termite.trail[-1].x + termite.trail[-1].xoffset),
-                   int(termite.trail[-1].y + termite.trail[-1].yoffset))
+            origin = (int(termite.trail[-1]['x']), int(termite.trail[-1]['y']))
+            end = (int(termite.trail[-1]['x'] + termite.trail[-1]['xoffset']),
+                   int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']))
             cv2.rectangle(self.frame, origin, end, termite.color)
             cv2.putText(self.frame, termite.label, (end[0]+5, end[1]+5), 2,
                         color=termite.color, fontScale=0.3)
@@ -173,10 +174,10 @@ class TermiteTracker:
             for termite in self.termites:
                 termite.trail = termite.trail[:max(1, len(termite.trail)-15)]
                 termite.tracker = cv2.Tracker_create('KCF')
-                termite.tracker.init(self.frame, (termite.trail[-1].x,
-                                     termite.trail[-1].y,
-                                     termite.trail[-1].xoffset,
-                                     termite.trail[-1].yoffset))
+                termite.tracker.init(self.frame, (termite.trail[-1]['x'],
+                                     termite.trail[-1]['y'],
+                                     termite.trail[-1]['xoffset'],
+                                     termite.trail[-1]['yoffset']))
             self.video.set(cv2.CAP_PROP_POS_FRAMES,
                            max(1, self.video.get(cv2.CAP_PROP_POS_FRAMES) - 30))
 

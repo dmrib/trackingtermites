@@ -28,5 +28,6 @@ class Termite:
             trail_out.write('label,frame,time,x,y,xoffset,yoffset\n')
             for record in self.trail:
                 trail_out.write('{},{},{},{},{},{},{}\n'.format(self.label,
-                                record.frame, record.time, record.x, record.y,
-                                record.xoffset, record.yoffset))
+                                record['frame'], record['time'], record['x'],
+                                record['y'], record['xoffset'],
+                                record['yoffset']))
