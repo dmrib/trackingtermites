@@ -49,7 +49,11 @@ class TermiteTracker:
             print('Could not find the video file.')
             sys.exit()
 
-        self._read_next_frame()
+        self.playing, self.frame = self.video.read()
+        if not self.playing:
+            print('Could not start video.')
+            sys.exit()
+        self.frame = cv2.resize(self.frame, (0,0), fx=0.5, fy=0.5)
 
     def _read_next_frame(self):
         '''Read next frame from current video.
@@ -60,11 +64,10 @@ class TermiteTracker:
             None.
         '''
         self.playing, self.frame = self.video.read()
-        self.frame = cv2.resize(self.frame, (0,0), fx=0.5, fy=0.5)
         if not self.playing:
-            print('Could not start video.')
-            sys.exit()
-        return True
+            return self.playing
+        self.frame = cv2.resize(self.frame, (0,0), fx=0.5, fy=0.5)
+        return self.playing
 
     def _select_termites(self):
         '''Open UI tool for selecting termites on current frame, create termite
@@ -203,8 +206,7 @@ class TermiteTracker:
 
         # Tracking loop
         while True:
-            go_on = self._read_next_frame()
-            if not go_on:
+            if not self._read_next_frame():
                 break
             self._update_positions()
             self._draw_boxes()

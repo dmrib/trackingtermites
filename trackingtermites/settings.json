@@ -1,7 +1,7 @@
 {
     "experiment_name": "test_exp",
     "output_path": "data/",
-    "video_path": "/media/dmrib/tdata/Og-footage/sample.mp4",
-    "n_termites": 2,
+    "video_path": "data/sample.mp4",
+    "n_termites": 4,
     "movie_speed": 1
 }
