@@ -78,7 +78,8 @@ class TermiteTracker:
         for i in range(1, self.settings['n_termites']+1):
             random_color = (random.randint(0, 255), random.randint(0, 255),
                             random.randint(0, 255))
-            termite = trmt.Termite(str(i), random_color)
+            termite = trmt.Termite(self.settings['label_prefix'] + str(i),
+                                   random_color)
             termite.tracker = cv2.Tracker_create('KCF')
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
