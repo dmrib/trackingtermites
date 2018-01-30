@@ -1,4 +1,5 @@
 import cv2
+import datetime
 import json
 import os
 import random
@@ -50,7 +51,8 @@ class TermiteTracker:
         if not self.playing:
             print('Could not start video.')
             sys.exit()
-        self.frame = cv2.resize(self.frame, (0,0), fx=0.5, fy=0.5)
+        self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
+                                fy=self.settings['resize_ratio'])
 
     def _read_next_frame(self):
         '''Read next frame from current video.
@@ -63,7 +65,8 @@ class TermiteTracker:
         self.playing, self.frame = self.video.read()
         if not self.playing:
             return self.playing
-        self.frame = cv2.resize(self.frame, (0,0), fx=0.5, fy=0.5)
+        self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
+                                fy=self.settings['resize_ratio'])
         return self.playing
 
     def _select_termites(self):
@@ -78,8 +81,7 @@ class TermiteTracker:
         for i in range(1, self.settings['n_termites']+1):
             random_color = (random.randint(0, 255), random.randint(0, 255),
                             random.randint(0, 255))
-            termite = trmt.Termite(self.settings['label_prefix'] + str(i),
-                                   random_color)
+            termite = trmt.Termite(str(i), random_color)
             termite.tracker = cv2.Tracker_create(self.settings['tracking_method'])
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
@@ -130,9 +132,9 @@ class TermiteTracker:
             origin = (int(termite.trail[-1]['x']), int(termite.trail[-1]['y']))
             end = (int(termite.trail[-1]['x'] + termite.trail[-1]['xoffset']),
                    int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']))
-            cv2.rectangle(self.frame, origin, end, termite.color)
+            cv2.rectangle(self.frame, origin, end, termite.color, 2)
             cv2.putText(self.frame, termite.label, (end[0]+5, end[1]+5), 2,
-                        color=termite.color, fontScale=0.3)
+                        color=termite.color, fontScale=0.4)
 
     def _draw_frame_info(self):
         '''Write frame meta info on the current frame.
@@ -182,7 +184,8 @@ class TermiteTracker:
         new_position = cv2.selectROI('Select the termite...', self.frame,
                                      False, False)
         cv2.destroyWindow('Select the termite...')
-        self.termites[to_correct-1].tracker = cv2.Tracker_create('KCF')
+        self.termites[to_correct-1].tracker = cv2.Tracker_create(
+                                              self.settings['tracking_method'])
         self.termites[to_correct-1].tracker.init(self.frame, new_position)
 
     def _rewind(self):
@@ -213,12 +216,31 @@ class TermiteTracker:
         Return:
             None.
         '''
+        self._create_meta()
+
         output_path = os.path.join(self.settings['output_path'] +
                                    self.settings['experiment_name'])
         if not os.path.exists(output_path):
             os.makedirs(output_path)
+        with open(output_path+'/meta.json', mode='w') as output_file:
+            json.dump(self.meta, output_file, indent=4)
         for termite in self.termites:
             termite.to_csv(output_path)
+
+    def _create_meta(self):
+        '''Create experiment description file.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        self.meta = {k: self.settings[k] for k in ('experiment_name',
+                     'conducted_by', 'tracking_method', 'n_termites',
+                     'resize_ratio')}
+        self.meta['movie_name'] = os.path.basename(self.settings['video_path'])
+        self.meta['date'] = '{}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        self.meta['movie_fps'] = self.video.get(cv2.CAP_PROP_FPS)
 
     def track(self):
         '''Tracking loop.
