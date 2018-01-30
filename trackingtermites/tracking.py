@@ -12,6 +12,13 @@ Record = namedtuple('Record', ['frame', 'time', 'x', 'y', 'xoffset', 'yoffset'])
 
 class TermiteTracker:
     def __init__(self, settings_file_path):
+        '''Initializer.
+
+        Args:
+            settings_file_path (str): path to tracking session settings file.
+        Returns:
+            None.
+        '''
         self._load_settings(settings_file_path)
         self.termites = []
         self.video = None
@@ -19,10 +26,24 @@ class TermiteTracker:
         self.playing = False
 
     def _load_settings(self, settings_file_path):
+        '''Load tracking session settings.
+
+        Args:
+            settings_file_path (str): path to tracking session settings file.
+        Returns:
+            None.
+        '''
         with open(settings_file_path) as settings_file:
             self.settings = json.load(settings_file)
 
     def _load_video(self):
+        '''Load experiment video.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         self.video = cv2.VideoCapture(self.settings['video_path'])
         if not self.video.isOpened:
             print('Could not find the video file.')
@@ -31,6 +52,13 @@ class TermiteTracker:
         self._read_next_frame()
 
     def _read_next_frame(self):
+        '''Read next frame from current video.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         self.playing, self.frame = self.video.read()
         self.frame = cv2.resize(self.frame, (0,0), fx=0.5, fy=0.5)
         if not self.playing:
@@ -39,6 +67,14 @@ class TermiteTracker:
         return True
 
     def _select_termites(self):
+        '''Open UI tool for selecting termites on current frame, create termite
+           representation and append to termites list.
+
+        Args:
+            None.
+        Return:
+            None.
+        '''
         for i in range(1, self.settings['n_termites']+1):
             random_color = (random.randint(0, 255), random.randint(0, 255),
                             random.randint(0, 255))
@@ -57,6 +93,14 @@ class TermiteTracker:
             self.termites.append(termite)
 
     def _update_positions(self):
+        '''Compute termite position on frame using the tracker output and
+           append to the termite's trail.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         for termite in self.termites:
             found, termite_pos = termite.tracker.update(self.frame)
             if not found:
@@ -69,6 +113,14 @@ class TermiteTracker:
                                      termite_pos[2], termite_pos[3]))
 
     def _draw_boxes(self):
+        '''Draw box on current frame representing a termite current predicted
+           region.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         for termite in self.termites:
             origin = (int(termite.trail[-1].x), int(termite.trail[-1].y))
             end = (int(termite.trail[-1].x + termite.trail[-1].xoffset),
@@ -78,6 +130,13 @@ class TermiteTracker:
                         color=termite.color, fontScale=0.3)
 
     def _draw_frame_info(self):
+        '''Write frame meta info on the current frame.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         cv2.putText(self.frame, 'Frame #{}, of {} {}ms delay.'.format(
                     int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
                     int(self.video.get(cv2.CAP_PROP_FRAME_COUNT)),
@@ -85,6 +144,13 @@ class TermiteTracker:
                     fontScale=0.7)
 
     def _process_event(self, pressed_key):
+        '''Process a key press triggered event on tracking loop.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         if pressed_key == 27:
             return False
         elif pressed_key == ord('p'):
@@ -114,10 +180,24 @@ class TermiteTracker:
         return True
 
     def _write_output(self, output_path):
+        '''Write termites' tracking output to csv file.
+
+        Args:
+            output_path (str): destination path to the csv file.
+        Return:
+            None.
+        '''
         for termite in self.termites:
             termite.to_csv(output_path)
 
     def track(self):
+        '''Tracking loop.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         self._load_video()
         self._select_termites()
 
