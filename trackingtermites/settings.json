@@ -3,5 +3,6 @@
     "output_path": "data/",
     "video_path": "data/sample.mp4",
     "n_termites": 4,
-    "movie_speed": 1
+    "movie_speed": 1,
+    "rewind_steps": 30
 }

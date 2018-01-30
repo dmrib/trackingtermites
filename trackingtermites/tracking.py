@@ -172,14 +172,16 @@ class TermiteTracker:
             self.termites[correct-1].tracker.init(self.frame, new_position)
         elif pressed_key == ord('w'):
             for termite in self.termites:
-                termite.trail = termite.trail[:max(1, len(termite.trail)-15)]
+                termite.trail = termite.trail[:max(1, len(termite.trail) -
+                                self.settings['rewind_steps'])]
                 termite.tracker = cv2.Tracker_create('KCF')
                 termite.tracker.init(self.frame, (termite.trail[-1]['x'],
                                      termite.trail[-1]['y'],
                                      termite.trail[-1]['xoffset'],
                                      termite.trail[-1]['yoffset']))
             self.video.set(cv2.CAP_PROP_POS_FRAMES,
-                           max(1, self.video.get(cv2.CAP_PROP_POS_FRAMES) - 30))
+                           max(1, self.video.get(cv2.CAP_PROP_POS_FRAMES) -
+                                  self.settings['rewind_steps']))
 
         return True
 
