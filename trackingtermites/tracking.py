@@ -164,26 +164,45 @@ class TermiteTracker:
         elif pressed_key == ord(','):
             self.settings['movie_speed'] += 10
         elif pressed_key == ord('r'):
-            correct = int(input('Termite number: '))
-            new_position = cv2.selectROI('Select the termite...', self.frame,
-                                         False, False)
-            cv2.destroyWindow('Select the termite...')
-            self.termites[correct-1].tracker = cv2.Tracker_create('KCF')
-            self.termites[correct-1].tracker.init(self.frame, new_position)
+            self._correct_termite()
         elif pressed_key == ord('w'):
-            for termite in self.termites:
-                termite.trail = termite.trail[:max(1, len(termite.trail) -
-                                self.settings['rewind_steps'])]
-                termite.tracker = cv2.Tracker_create('KCF')
-                termite.tracker.init(self.frame, (termite.trail[-1]['x'],
-                                     termite.trail[-1]['y'],
-                                     termite.trail[-1]['xoffset'],
-                                     termite.trail[-1]['yoffset']))
-            self.video.set(cv2.CAP_PROP_POS_FRAMES,
-                           max(1, self.video.get(cv2.CAP_PROP_POS_FRAMES) -
-                                  self.settings['rewind_steps']))
-
+            self._rewind()
         return True
+
+    def _correct_termite(self):
+        '''Correct termite position and restart tracker.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        to_correct = int(input('Termite number: '))
+        new_position = cv2.selectROI('Select the termite...', self.frame,
+                                     False, False)
+        cv2.destroyWindow('Select the termite...')
+        self.termites[to_correct-1].tracker = cv2.Tracker_create('KCF')
+        self.termites[to_correct-1].tracker.init(self.frame, new_position)
+
+    def _rewind(self):
+        '''Rewind tracking experiment.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for termite in self.termites:
+            termite.trail = termite.trail[:max(1, len(termite.trail) -
+                            self.settings['rewind_steps'])]
+            termite.tracker = cv2.Tracker_create('KCF')
+            termite.tracker.init(self.frame, (termite.trail[-1]['x'],
+                                 termite.trail[-1]['y'],
+                                 termite.trail[-1]['xoffset'],
+                                 termite.trail[-1]['yoffset']))
+        self.video.set(cv2.CAP_PROP_POS_FRAMES,
+                       max(1, self.video.get(cv2.CAP_PROP_POS_FRAMES) -
+                              self.settings['rewind_steps']))
 
     def _write_output(self, output_path):
         '''Write termites' tracking output to csv file.
