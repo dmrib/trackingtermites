@@ -1,0 +1,10 @@
+{
+    "movie_name": "sample.mp4",
+    "tracking_method": "KCF",
+    "experiment_name": "Sample Experiment",
+    "movie_fps": 30.0,
+    "n_termites": 4,
+    "conducted_by": "UFV Termitology Lab",
+    "date": "2018-01-30 20:34:10",
+    "resize_ratio": 0.5
+}
