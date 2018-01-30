@@ -1,5 +1,5 @@
 {
-    "experiment_name": "test_exp",
+    "experiment_name": "sample_experiment",
     "output_path": "data/",
     "video_path": "data/sample.mp4",
     "n_termites": 4,

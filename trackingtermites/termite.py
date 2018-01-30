@@ -24,7 +24,7 @@ class Termite:
         Returns:
             None.
         '''
-        with open('{}{}-trail.csv'.format(output_path, self.label), mode='w') as trail_out:
+        with open('{}/{}-trail.csv'.format(output_path, self.label), mode='w') as trail_out:
             trail_out.write('label,frame,time,x,y,xoffset,yoffset\n')
             for record in self.trail:
                 trail_out.write('{},{},{},{},{},{},{}\n'.format(self.label,

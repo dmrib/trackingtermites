@@ -1,6 +1,6 @@
-from collections import namedtuple
 import cv2
 import json
+import os
 import random
 import sys
 import termite as trmt
@@ -212,6 +212,10 @@ class TermiteTracker:
         Return:
             None.
         '''
+        output_path = os.path.join(self.settings['output_path'] +
+                                   self.settings['experiment_name'])
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         for termite in self.termites:
             termite.to_csv(output_path)
 
