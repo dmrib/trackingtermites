@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import numpy as np
 import os
 
 
@@ -40,6 +41,33 @@ class LabelingSession():
             file_path = os.path.join(source_folder_path, file_name)
             self.termites.append(pd.read_csv(file_path))
 
+    def _compute_distances(self):
+        '''Compute distances between termites on every experiment frame and
+           updates dataframes.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for a_number, termite_a in enumerate(self.termites, start=1):
+            for b_number, termite_b in enumerate(self.termites, start=1):
+                if a_number != b_number:
+                    distance = np.sqrt((((termite_a['x']-termite_b['x'])**2) +
+                               ((termite_a['y']-termite_b['y'])**2)))
+                    termite_a['distance_to_{}'.format(b_number)] = distance
+
+    def start(self):
+        '''Starts labeling session.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        self._compute_distances()
+
 
 if __name__ == '__main__':
     labeling = LabelingSession('data/Sample Experiment')
+    labeling.start()
