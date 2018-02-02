@@ -237,7 +237,7 @@ class TermiteTracker:
         '''
         self.meta = {k: self.settings[k] for k in ('experiment_name',
                      'conducted_by', 'tracking_method', 'n_termites',
-                     'resize_ratio')}
+                     'resize_ratio', 'video_path', 'resize_ratio')}
         self.meta['movie_name'] = os.path.basename(self.settings['video_path'])
         self.meta['date'] = '{}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         self.meta['movie_fps'] = self.video.get(cv2.CAP_PROP_FPS)
