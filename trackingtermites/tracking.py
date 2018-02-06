@@ -131,7 +131,7 @@ class TermiteTracker:
                    int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']))
             cv2.rectangle(self.frame, origin, end, termite.color, 2)
             cv2.putText(self.frame, termite.label, (end[0]+5, end[1]+5), 2,
-                        color=termite.color, fontScale=0.4)
+                        color=termite.color, fontScale=0.3)
 
     def _draw_frame_info(self):
         '''Write frame meta info on the current frame.

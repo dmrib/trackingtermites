@@ -71,6 +71,7 @@ class LabelingSession():
         for termite in self.termites:
             termite.trail['x'] = termite.trail['x'] + termite.trail['xoffset']/2
             termite.trail['y'] = termite.trail['y'] + termite.trail['yoffset']/2
+
         for a_number, termite_a in enumerate(self.termites, start=1):
             for b_number, termite_b in enumerate(self.termites, start=1):
                 if a_number != b_number:
@@ -81,7 +82,7 @@ class LabelingSession():
     def _save_termite_data(self):
         for termite in self.termites:
             destination_path = os.path.join(self.source_folder_path, 'Labeled')
-            termite.to_csv(destination_path+'{}.csv'.format(termite.trail.loc[0, "label"]))
+            termite.to_csv(destination_path+'/{}.csv'.format(termite.trail.loc[0, "label"]))
         sys.exit()
 
     def start_session(self):
@@ -110,7 +111,7 @@ class LabelingSession():
                 predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
                 for other in range(n_termite+1, len(self.termites)):
                     other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
-                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 60:
+                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 70:
                         cv2.line(frame, predicted, other_predicted, (0,0,255), 1)
                         half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
                         cv2.circle(frame, half, 3, (255, 0, 0), -1)
