@@ -2,7 +2,6 @@ import cv2
 import datetime
 import json
 import os
-import random
 import sys
 import termite as trmt
 import time
@@ -79,9 +78,7 @@ class TermiteTracker:
             None.
         '''
         for i in range(1, self.settings['n_termites']+1):
-            random_color = (random.randint(0, 255), random.randint(0, 255),
-                            random.randint(0, 255))
-            termite = trmt.Termite(str(i), random_color)
+            termite = trmt.Termite('t' + str(i))
             termite.tracker = cv2.Tracker_create(self.settings['tracking_method'])
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
