@@ -1,3 +1,4 @@
+import pandas as pd
 import random
 
 
@@ -41,3 +42,4 @@ class Termite:
         Returns:
             None.
         '''
+        self.trail = pd.read_csv(source_path)
