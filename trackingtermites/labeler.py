@@ -138,6 +138,7 @@ class LabelingSession():
                                                                         frame_number)), event)
 
                         cv2.destroyWindow('Encounter')
+        self._save_termite_data()
 
 
 
