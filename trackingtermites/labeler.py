@@ -1,8 +1,9 @@
 import cv2
-import pandas as pd
 import json
 import numpy as np
 import os
+import pandas as pd
+import sys
 import termite as trmt
 
 
@@ -19,6 +20,14 @@ class LabelingSession():
 
         self._load_metadata(source_folder_path)
         self._load_termites(source_folder_path)
+
+        self.output_path = os.path.join(source_folder_path, 'Labeled')
+
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
+            os.makedirs(os.path.join(self.output_path, 'proctodeal'))
+            os.makedirs(os.path.join(self.output_path, 'stomatodeal'))
+            os.makedirs(os.path.join(self.output_path, 'no-trophallaxis'))
 
         self.video = cv2.VideoCapture(self.metadata['video_path'])
 
@@ -65,7 +74,7 @@ class LabelingSession():
                                ((termite_a.trail['y']-termite_b.trail['y'])**2)))
                     termite_a.trail['distance_to_t{}'.format(b_number)] = distance
 
-    def start(self):
+    def start_session(self):
         '''Starts labeling session.
 
         Args:
@@ -97,14 +106,29 @@ class LabelingSession():
                             half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
                             cv2.circle(frame, half, 3, (255, 0, 0), -1)
 
-                            cv2.imshow('Encounter', clear[(half[1]-25):(half[1]+25), (half[0]-25):(half[0]+25)])
-                            cv2.waitKey(10)
+                            event = clear[(half[1]-25):(half[1]+25), (half[0]-25):(half[0]+25)]
+                            cv2.imshow('Encounter', event)
+
+                            encouter_label = cv2.waitKey(0) & 0xff
+                            if encouter_label == 27:
+                                sys.exit()
+                            elif encouter_label == ord('q'):
+                                cv2.imwrite(os.path.join(self.output_path, 'proctodeal/{}-{}-proctodeal.jpg'.format(termite.trail.loc[0, 'label'],
+                                                                            frame_number)), event)
+                            elif encouter_label == ord('w'):
+                                cv2.imwrite(os.path.join(self.output_path, 'stomatodeal/{}-{}-stomatodeal.jpg'.format(termite.trail.loc[0, 'label'],
+                                                                            frame_number)), event)
+                            elif encouter_label == ord('e'):
+                                cv2.imwrite(os.path.join(self.output_path, 'no-trophallaxis/{}-{}-no-trophallaxis.jpg'.format(termite.trail.loc[0, 'label'],
+                                                                            frame_number)), event)
+
+                            cv2.destroyWindow('Encounter')
 
             cv2.imshow('Labeling...', frame)
             pressed_key = cv2.waitKey(10) & 0xff
             if pressed_key == 27:
-                return False
+                sys.exit()
 
 if __name__ == '__main__':
     labeling = LabelingSession('data/Sample Experiment')
-    labeling.start()
+    labeling.start_session()
