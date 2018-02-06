@@ -63,7 +63,7 @@ class LabelingSession():
                 if a_number != b_number:
                     distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
                                ((termite_a.trail['y']-termite_b.trail['y'])**2)))
-                    termite_a.trail['distance_to_{}'.format(b_number)] = distance
+                    termite_a.trail['distance_to_t{}'.format(b_number)] = distance
 
     def start(self):
         '''Starts labeling session.
@@ -75,21 +75,33 @@ class LabelingSession():
         '''
         self._compute_distances()
 
-        for frame_number in range(len(self.termites[0].trail['frame'])):
+        for frame_number in range(1, len(self.termites[0].trail['frame'])):
             playing, frame = self.video.read()
             frame = cv2.resize(frame, (0,0), fx=self.metadata['resize_ratio'],
                        fy=self.metadata['resize_ratio'])
+            clear = frame.copy()
 
             for termite in self.termites:
                 predicted = (int(termite.trail.loc[frame_number, 'x'] + (termite.trail.loc[frame_number, 'xoffset']/2)),
                              int(termite.trail.loc[frame_number, 'y'] + (termite.trail.loc[frame_number, 'yoffset']/2)))
                 cv2.circle(frame, predicted, 3, termite.color, -1)
                 cv2.putText(frame, termite.trail.loc[frame_number,'label'], (predicted[0]+5, predicted[1]+5), 2,
-                            color=termite.color, fontScale=0.4)
+                            color=termite.color, fontScale=0.3)
+
+                for other in self.termites:
+                    if other.trail.loc[0, 'label'] != termite.trail.loc[0, 'label']:
+                        other_predicted = (int(other.trail.loc[frame_number, 'x'] + (other.trail.loc[frame_number, 'xoffset']/2)),
+                                           int(other.trail.loc[frame_number, 'y'] + (other.trail.loc[frame_number, 'yoffset']/2)))
+                        if termite.trail.loc[frame_number, 'distance_to_{}'.format(other.trail.loc[0, 'label'])] < 60:
+                            cv2.line(frame, predicted, other_predicted, (0,0,255), 1)
+                            half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
+                            cv2.circle(frame, half, 3, (255, 0, 0), -1)
+
+                            cv2.imshow('Encounter', clear[(half[1]-25):(half[1]+25), (half[0]-25):(half[0]+25)])
+                            cv2.waitKey(10)
 
             cv2.imshow('Labeling...', frame)
-            pressed_key = cv2.waitKey(1) & 0xff
-
+            pressed_key = cv2.waitKey(10) & 0xff
             if pressed_key == 27:
                 return False
 
