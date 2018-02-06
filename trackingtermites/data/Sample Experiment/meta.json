@@ -1,11 +1,11 @@
 {
-    "n_termites": 4,
     "experiment_name": "Sample Experiment",
+    "video_path": "data/sample.mp4",
+    "movie_fps": 30.0,
+    "movie_name": "sample.mp4",
+    "tracking_method": "KCF",
+    "n_termites": 4,
     "conducted_by": "UFV Termitology Lab",
     "resize_ratio": 0.5,
-    "tracking_method": "KCF",
-    "date": "2018-02-02 20:03:39",
-    "movie_fps": 30.0,
-    "video_path": "data/sample.mp4",
-    "movie_name": "sample.mp4"
+    "date": "2018-02-06 18:00:16"
 }
