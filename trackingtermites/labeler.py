@@ -18,10 +18,11 @@ class LabelingSession():
         '''
         self.termites = []
 
-        self._load_metadata(source_folder_path)
-        self._load_termites(source_folder_path)
+        self.source_folder_path = source_folder_path
+        self._load_metadata()
+        self._load_termites()
 
-        self.output_path = os.path.join(source_folder_path, 'Labeled')
+        self.output_path = os.path.join(self.source_folder_path, 'Labeled')
 
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
@@ -31,30 +32,30 @@ class LabelingSession():
 
         self.video = cv2.VideoCapture(self.metadata['video_path'])
 
-    def _load_metadata(self, source_folder_path):
+    def _load_metadata(self):
         '''Load tracking metadata file.
 
         Args:
-            source_folder_path (str): path to folder containing tracking data.
+            None.
         Returns:
             None.
         '''
-        with open(os.path.join(source_folder_path, 'meta.json')) as metadata:
+        with open(os.path.join(self.source_folder_path, 'meta.json')) as metadata:
             self.metadata = json.load(metadata)
 
-    def _load_termites(self, source_folder_path):
+    def _load_termites(self):
         '''Load termite data.
 
         Args:
-            source_folder_path (str): path to folder containing tracking data.
+            None.
         Returns:
             None.
         '''
         for termite_number in range(1, self.metadata['n_termites'] + 1):
             label = 't' + str(termite_number)
             file_name = '{}-trail.csv'.format(label)
-            file_path = os.path.join(source_folder_path, file_name)
-            termite = trmt.Termite(label)
+            file_path = os.path.join(self.source_folder_path, file_name)
+            termite = trmt.PandasTermite(label)
             termite.from_csv(file_path)
             self.termites.append(termite)
 
@@ -76,6 +77,12 @@ class LabelingSession():
                     distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
                                ((termite_a.trail['y']-termite_b.trail['y'])**2)))
                     termite_a.trail['distance_to_t{}'.format(b_number)] = distance
+
+    def _save_termite_data(self):
+        for termite in self.termites:
+            destination_path = os.path.join(self.source_folder_path, 'Labeled')
+            termite.to_csv(destination_path+'{}.csv'.format(termite.trail.loc[0, "label"]))
+        sys.exit()
 
     def start_session(self):
         '''Starts labeling session.
@@ -117,7 +124,8 @@ class LabelingSession():
                         cv2.imshow('Encounter', evaluation)
                         encouter_label = cv2.waitKey(0) & 0xff
                         if encouter_label == 27:
-                            sys.exit()
+                            cv2.destroyAllWindows()
+                            self._save_termite_data()
                         elif encouter_label == ord('q'):
                             cv2.imwrite(os.path.join(self.output_path, 'head-head/{}-{}-head-head.jpg'.format(self.termites[n_termite].trail.loc[0, 'label'],
                                                                         frame_number)), event)
@@ -129,6 +137,8 @@ class LabelingSession():
                                                                         frame_number)), event)
 
                         cv2.destroyWindow('Encounter')
+
+
 
 
 if __name__ == '__main__':
