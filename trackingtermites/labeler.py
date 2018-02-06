@@ -67,6 +67,9 @@ class LabelingSession():
         Returns:
             None.
         '''
+        for termite in self.termites:
+            termite.trail['x'] = termite.trail['x'] + termite.trail['xoffset']/2
+            termite.trail['y'] = termite.trail['y'] + termite.trail['yoffset']/2
         for a_number, termite_a in enumerate(self.termites, start=1):
             for b_number, termite_b in enumerate(self.termites, start=1):
                 if a_number != b_number:
@@ -91,23 +94,27 @@ class LabelingSession():
             clear = frame.copy()
 
             for n_termite in range(len(self.termites)):
-                predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x'] + (self.termites[n_termite].trail.loc[frame_number, 'xoffset']/2)),
-                             int(self.termites[n_termite].trail.loc[frame_number, 'y'] + (self.termites[n_termite].trail.loc[frame_number, 'yoffset']/2)))
+                predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
                 cv2.circle(frame, predicted, 3, self.termites[n_termite].color, -1)
                 cv2.putText(frame, self.termites[n_termite].trail.loc[frame_number,'label'], (predicted[0]+5, predicted[1]+5), 2,
                             color=self.termites[n_termite].color, fontScale=0.3)
 
+            for n_termite in range(len(self.termites)):
+                predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
                 for other in range(n_termite+1, len(self.termites)):
-                    other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x'] + (self.termites[other].trail.loc[frame_number, 'xoffset']/2)),
-                                       int(self.termites[other].trail.loc[frame_number, 'y'] + (self.termites[other].trail.loc[frame_number, 'yoffset']/2)))
+                    other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
                     if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 60:
                         cv2.line(frame, predicted, other_predicted, (0,0,255), 1)
                         half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
                         cv2.circle(frame, half, 3, (255, 0, 0), -1)
 
                         event = clear[(half[1]-25):(half[1]+25), (half[0]-25):(half[0]+25)]
-                        cv2.imshow('Encounter', event)
+                        edges = cv2.Canny(event,100,100)
+                        edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+                        evaluation = np.hstack((event, edges))
 
+                        cv2.imshow('Labeling...', frame)
+                        cv2.imshow('Encounter', evaluation)
                         encouter_label = cv2.waitKey(0) & 0xff
                         if encouter_label == 27:
                             sys.exit()
@@ -123,10 +130,6 @@ class LabelingSession():
 
                         cv2.destroyWindow('Encounter')
 
-            cv2.imshow('Labeling...', frame)
-            pressed_key = cv2.waitKey(10) & 0xff
-            if pressed_key == 27:
-                sys.exit()
 
 if __name__ == '__main__':
     labeling = LabelingSession('data/Sample Experiment')
