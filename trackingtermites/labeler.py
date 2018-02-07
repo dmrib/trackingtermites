@@ -78,6 +78,7 @@ class LabelingSession():
                     distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
                                ((termite_a.trail['y']-termite_b.trail['y'])**2)))
                     termite_a.trail['distance_to_t{}'.format(b_number)] = distance
+                    termite_a.trail['interaction_with_t{}'.format(b_number)] = 'no-interaction'
 
     def _save_termite_data(self):
         for termite in self.termites:
@@ -130,17 +131,20 @@ class LabelingSession():
                         elif encouter_label == ord('q'):
                             cv2.imwrite(os.path.join(self.output_path, 'head-head/{}-{}-head-head.jpg'.format(self.termites[n_termite].trail.loc[0, 'label'],
                                                                         frame_number)), event)
+                            self.termites[n_termite].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[other].trail.loc[0, 'label'])] = 'head-head'
+                            self.termites[other].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[n_termite].trail.loc[0, 'label'])] = 'head-head'
+
                         elif encouter_label == ord('w'):
                             cv2.imwrite(os.path.join(self.output_path, 'head-abdomen/{}-{}-head-abdomen.jpg'.format(self.termites[n_termite].trail.loc[0, 'label'],
                                                                         frame_number)), event)
+                            self.termites[n_termite].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[other].trail.loc[0, 'label'])] = 'head-abdomen'
+                            self.termites[other].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[n_termite].trail.loc[0, 'label'])] = 'head-abdomen'
                         elif encouter_label == ord('e'):
                             cv2.imwrite(os.path.join(self.output_path, 'no-interaction/{}-{}-no-interaction.jpg'.format(self.termites[n_termite].trail.loc[0, 'label'],
                                                                         frame_number)), event)
 
                         cv2.destroyWindow('Encounter')
         self._save_termite_data()
-
-
 
 
 if __name__ == '__main__':
