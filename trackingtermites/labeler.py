@@ -118,7 +118,7 @@ class LabelingSession():
                         cv2.circle(frame, half, 3, (255, 0, 0), -1)
 
                         event = clear[(half[1]-25):(half[1]+25), (half[0]-25):(half[0]+25)]
-                        edges = cv2.Canny(event,100,100)
+                        edges = cv2.Canny(event,40,40)
                         edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
                         evaluation = np.hstack((event, edges))
                         evaluation = cv2.resize(evaluation, (0,0), fx=5,
