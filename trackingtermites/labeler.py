@@ -121,6 +121,8 @@ class LabelingSession():
                         edges = cv2.Canny(event,100,100)
                         edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
                         evaluation = np.hstack((event, edges))
+                        evaluation = cv2.resize(evaluation, (0,0), fx=5,
+                                                fy=5)
 
                         cv2.imshow('Labeling...', frame)
                         cv2.imshow('Encounter', evaluation)
