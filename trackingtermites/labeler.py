@@ -97,6 +97,7 @@ class LabelingSession():
         self._compute_distances()
 
         for frame_number in range(1, len(self.termites[0].trail['frame'])):
+            print(frame_number)
             playing, frame = self.video.read()
             frame = cv2.resize(frame, (0,0), fx=self.metadata['resize_ratio'],
                                fy=self.metadata['resize_ratio'])
@@ -112,13 +113,13 @@ class LabelingSession():
                 predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
                 for other in range(n_termite+1, len(self.termites)):
                     other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
-                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 70:
+                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 50:
                         cv2.line(frame, predicted, other_predicted, (0,0,255), 1)
                         half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
                         cv2.circle(frame, half, 3, (255, 0, 0), -1)
 
-                        event = clear[(half[1]-25):(half[1]+25), (half[0]-25):(half[0]+25)]
-                        edges = cv2.Canny(event,40,40)
+                        event = clear[(half[1]-30):(half[1]+30), (half[0]-30):(half[0]+30)]
+                        edges = cv2.Canny(event,75,75)
                         edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
                         evaluation = np.hstack((event, edges))
                         evaluation = cv2.resize(evaluation, (0,0), fx=5,
@@ -148,7 +149,6 @@ class LabelingSession():
                         cv2.destroyWindow('Encounter')
         self._save_termite_data()
 
-
 if __name__ == '__main__':
-    labeling = LabelingSession('data/Sample Experiment')
+    labeling = LabelingSession('data/Pilot3')
     labeling.start_session()
