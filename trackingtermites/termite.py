@@ -26,16 +26,6 @@ class Termite:
         Returns:
             None.
         '''
-        with open('{}/{}-trail.csv'.format(output_path, self.label), mode='w') as trail_out:
-            trail_out.write('label,frame,time,x,y,xoffset,yoffset\n')
-            for record in self.trail:
-                trail_out.write('{},{},{},{},{},{},{}\n'.format(self.label,
-                                record['frame'], record['time'], record['x'],
-                                record['y'], record['xoffset'],
-                                record['yoffset']))
-
-class PandasTermite(Termite):
-    def to_csv(self, output_path):
         self.trail.to_csv(output_path, index=False, float_format='%.1f')
 
     def from_csv(self, source_path):

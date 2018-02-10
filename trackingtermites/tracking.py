@@ -6,6 +6,8 @@ import sys
 import termite as trmt
 import time
 
+import pandas as pd
+
 
 class TermiteTracker:
     def __init__(self, settings_file_path):
@@ -225,7 +227,8 @@ class TermiteTracker:
         with open(output_path+'/meta.json', mode='w') as output_file:
             json.dump(self.meta, output_file, indent=4)
         for termite in self.termites:
-            termite.to_csv(output_path)
+            termite.trail = pd.DataFrame(termite.trail)
+            termite.to_csv('{}/{}-trail.csv'.format(output_path, termite.label))
 
     def _create_meta(self):
         '''Create experiment description file.
