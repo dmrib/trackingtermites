@@ -84,7 +84,8 @@ class TermiteTracker:
             termite.tracker = cv2.Tracker_create(self.settings['tracking_method'])
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
-            termite.trail.append({'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
+            termite.trail.append({'label': termite.label,
+                                 'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
                                  'time': time.strftime("%H:%M:%S",
                                  time.gmtime(int(self.video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
                                  'x': termite_pos[0],
@@ -110,7 +111,8 @@ class TermiteTracker:
             if not found:
                 print('Termite lost.')
             else:
-                termite.trail.append({'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
+                termite.trail.append({'label': termite.label,
+                                     'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
                                      'time': time.strftime("%H:%M:%S",
                                      time.gmtime(int(self.video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
                                      'x': termite_pos[0],

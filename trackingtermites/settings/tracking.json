@@ -1,5 +1,5 @@
 {
-    "experiment_name": "BetterPredictions",
+    "experiment_name": "Sample Experiment",
     "conducted_by": "UFV Termitology Lab",
     "video_path": "data/sample.mp4",
     "tracking_method": "KCF",

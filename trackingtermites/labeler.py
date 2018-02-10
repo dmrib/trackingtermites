@@ -55,7 +55,7 @@ class LabelingSession():
             label = 't' + str(termite_number)
             file_name = '{}-trail.csv'.format(label)
             file_path = os.path.join(self.source_folder_path, file_name)
-            termite = trmt.PandasTermite(label)
+            termite = trmt.Termite(label)
             termite.from_csv(file_path)
             self.termites.append(termite)
 
@@ -150,5 +150,5 @@ class LabelingSession():
         self._save_termite_data()
 
 if __name__ == '__main__':
-    labeling = LabelingSession('data/Pilot3')
+    labeling = LabelingSession('data/Sample Experiment')
     labeling.start_session()
