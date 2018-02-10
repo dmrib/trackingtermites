@@ -1,6 +1,7 @@
 import pandas as pd
 import random
 
+random.seed(42)
 
 class Termite:
     def __init__(self, label):
