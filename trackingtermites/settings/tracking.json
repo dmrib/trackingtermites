@@ -1,0 +1,11 @@
+{
+    "experiment_name": "BetterPredictions",
+    "conducted_by": "Danilo Ribeiro",
+    "video_path": "data/00000.MTS",
+    "tracking_method": "KCF",
+    "output_path": "data/",
+    "n_termites": 31,
+    "resize_ratio": 1,
+    "movie_speed": 1,
+    "rewind_steps": 30
+}
