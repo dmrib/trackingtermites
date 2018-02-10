@@ -1,0 +1,9 @@
+{
+    "experiment_name": "Sample Experiment",
+    "conducted_by": "UFV Termitology Lab",
+    "video_path": "data/sample.mp4",
+    "source_folder": "data/Sample Experiment/",
+    "n_termites": 4,
+    "resize_ratio": 0.5,
+    "movie_speed": 1
+}
