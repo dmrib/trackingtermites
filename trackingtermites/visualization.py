@@ -45,6 +45,11 @@ class TrackingVisualization():
             termite.trail['y'] = termite.trail['y'] + termite.trail['yoffset']/2
 
         video = cv2.VideoCapture(self.settings['video_path'])
+        shape = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)*self.settings['resize_ratio']),
+                 int(video.get(cv2.CAP_PROP_FRAME_HEIGHT)*self.settings['resize_ratio']))
+        out = cv2.VideoWriter('{}/{}.avi'.format(self.settings['source_folder'],
+                              self.settings['experiment_name']),
+                              cv2.VideoWriter_fourcc(*'MJPG'), 30.0, shape)
 
         for step in range(1, len(self.termites[0].trail)):
             playing, frame = video.read()
@@ -52,6 +57,7 @@ class TrackingVisualization():
                 sys.exit()
             frame = cv2.resize(frame, (0,0), fx=self.settings['resize_ratio'],
                                     fy=self.settings['resize_ratio'])
+
             for termite in self.termites:
                 position = (int(termite.trail.loc[step,'x']),
                             int(termite.trail.loc[step,'y']))
@@ -64,6 +70,8 @@ class TrackingVisualization():
                             fontScale=0.7)
 
             cv2.imshow(self.settings['experiment_name'], frame)
+            out.write(frame)
+
             pressed_key = cv2.waitKey(self.settings['movie_speed']) & 0xff
             if pressed_key == 27:
                 sys.exit()
