@@ -129,7 +129,10 @@ class TermiteTracker:
             origin = (int(termite.trail[-1]['x']), int(termite.trail[-1]['y']))
             end = (int(termite.trail[-1]['x'] + termite.trail[-1]['xoffset']),
                    int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']))
+            predicted = (int(termite.trail[-1]['x'] + termite.trail[-1]['xoffset']/2),
+                         int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']/2))
             cv2.rectangle(self.frame, origin, end, termite.color, 2)
+            cv2.circle(self.frame, predicted, 3, termite.color, -1)
             cv2.putText(self.frame, termite.label, (end[0]+5, end[1]+5), 2,
                         color=termite.color, fontScale=0.3)
 
@@ -271,5 +274,5 @@ class TermiteTracker:
 
 
 if __name__ == '__main__':
-    tracker = TermiteTracker('settings.json')
+    tracker = TermiteTracker('settings/tracking.json')
     tracker.track()
