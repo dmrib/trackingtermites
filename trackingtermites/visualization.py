@@ -89,6 +89,41 @@ class TrackingVisualization():
                     self.settings['movie_speed']), (5,10), 1, color=(0, 0, 255),
                     fontScale=0.7)
 
+    def _draw_termites(self):
+        '''Draw termites' positions on current frame.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for termite in self.termites:
+            position = (int(termite.trail.loc[self.step,'x']),
+                        int(termite.trail.loc[self.step,'y']))
+            cv2.circle(self.frame, position, 3, termite.color, -1)
+            cv2.circle(self.frame, position, 8, termite.color, 2)
+            cv2.putText(self.frame, 'w'+termite.label[-1], (position[0]-7, position[1]-11), 2, color=termite.color,
+                        fontScale=0.4)
+
+    def _draw_trails(self):
+        '''Draw termites' trails on current frame.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for termite in self.termites:
+            f_trail = termite.trail.iloc[self.step:min(len(self.termites[0].trail), self.step+5)]
+            for future in f_trail.itertuples():
+                cv2.circle(self.frame, (int(future.x), int(future.y)), 2,
+                           termite.color, -1)
+
+            p_trail = termite.trail.iloc[max(0, self.step-5):self.step]
+            for past in p_trail.itertuples():
+                cv2.circle(self.frame, (int(past.x), int(past.y)), 2,
+                           termite.color, -1)
+
     def show(self):
         '''Start tracking session visualization.
 
@@ -97,31 +132,15 @@ class TrackingVisualization():
         Returns:
             None.
         '''
-        for step in range(1, len(self.termites[0].trail)):
+        for self.step in range(1, len(self.termites[0].trail)):
             self.playing, self.frame = self.video.read()
             if not self.playing:
                 sys.exit()
             self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
                                     fy=self.settings['resize_ratio'])
             self._draw_frame_info()
-
-            for termite in self.termites:
-                position = (int(termite.trail.loc[step,'x']),
-                            int(termite.trail.loc[step,'y']))
-                cv2.circle(self.frame, position, 3, termite.color, -1)
-                cv2.circle(self.frame, position, 8, termite.color, 2)
-                cv2.putText(self.frame, 'w'+termite.label[-1], (position[0]-7, position[1]-11), 2, color=termite.color,
-                            fontScale=0.4)
-
-                f_trail = termite.trail.iloc[step:min(len(self.termites[0].trail), step+5)]
-                for future in f_trail.itertuples():
-                    cv2.circle(self.frame, (int(future.x), int(future.y)), 2,
-                               termite.color, -1)
-
-                p_trail = termite.trail.iloc[max(0, step-5):step]
-                for past in p_trail.itertuples():
-                    cv2.circle(self.frame, (int(past.x), int(past.y)), 2,
-                               termite.color, -1)
+            self._draw_termites()
+            self._draw_trails()
 
             cv2.imshow(self.settings['experiment_name'], self.frame)
             self.out.write(self.frame)
