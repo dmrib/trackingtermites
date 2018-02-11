@@ -179,6 +179,8 @@ class TermiteTracker:
             self._correct_termite()
         elif pressed_key == ord('w'):
             self._rewind()
+        elif pressed_key == ord('s'):
+            self._write_output(self.settings['output_path'])
         return True
 
     def _correct_termite(self):
@@ -234,8 +236,8 @@ class TermiteTracker:
         with open(output_path+'/meta.json', mode='w') as output_file:
             json.dump(self.meta, output_file, indent=4)
         for termite in self.termites:
-            termite.trail = pd.DataFrame(termite.trail)
-            termite.to_csv('{}/{}-trail.csv'.format(output_path, termite.label))
+            trail = pd.DataFrame(termite.trail)
+            trail.to_csv('{}/{}-trail.csv'.format(output_path, termite.label))
 
     def _create_meta(self):
         '''Create experiment description file.
