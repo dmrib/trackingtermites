@@ -61,7 +61,7 @@ class TermiteTracker:
         Args:
             None.
         Returns:
-            None.
+            self.playing (bool): True if next frame was read successfuly.
         '''
         self.playing, self.frame = self.video.read()
         if not self.playing:
@@ -165,7 +165,7 @@ class TermiteTracker:
         Args:
             None.
         Returns:
-            None.
+            True (bool): indicates that the tracking session should go on.
         '''
         if pressed_key == 27:
             return False
