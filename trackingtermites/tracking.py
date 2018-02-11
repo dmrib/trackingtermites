@@ -84,6 +84,11 @@ class TermiteTracker:
             termite.tracker = cv2.Tracker_create(self.settings['tracking_method'])
             termite_pos = cv2.selectROI('Select the termite...', self.frame,
                                         False, False)
+            origin = (int(termite_pos[0]), int(termite_pos[1]))
+            end = (int(termite_pos[0] + termite_pos[2]),
+                   int(termite_pos[1] + termite_pos[3]))
+            cv2.rectangle(self.frame, origin, end, termite.color, 2)
+
             termite.trail.append({'label': termite.label,
                                  'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
                                  'time': time.strftime("%H:%M:%S",
