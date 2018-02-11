@@ -31,6 +31,13 @@ class TrackingVisualization():
             self.settings = json.load(settings_file)
 
     def _load_termites(self):
+        '''Load termite tracking session output from source folder.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         for termite_number in range(1, self.settings['n_termites'] + 1):
             label = 't' + str(termite_number)
             file_name = '{}-trail.csv'.format(label)
@@ -39,10 +46,26 @@ class TrackingVisualization():
             termite.from_csv(file_path)
             self.termites.append(termite)
 
-    def show(self):
+    def _adjust_predictions(self):
+        '''Adjust termites x and y components to better postion predictions.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         for termite in self.termites:
-            termite.trail['x'] = termite.trail['x'] + termite.trail['xoffset']/2
-            termite.trail['y'] = termite.trail['y'] + termite.trail['yoffset']/2
+            termite.normalize()
+
+    def show(self):
+        '''Show tracking session visualization.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        self._adjust_predictions()
 
         video = cv2.VideoCapture(self.settings['video_path'])
         shape = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)*self.settings['resize_ratio']),
@@ -51,7 +74,7 @@ class TrackingVisualization():
                               self.settings['experiment_name']),
                               cv2.VideoWriter_fourcc(*'MJPG'), 30.0, shape)
 
-        for step in range(1, len(self.termites[0].trail)):
+        for step in range(1, len(self.termites[0].trail)-40):
             playing, frame = video.read()
             if not playing:
                 sys.exit()
@@ -63,6 +86,20 @@ class TrackingVisualization():
                             int(termite.trail.loc[step,'y']))
                 cv2.circle(frame, position, 3, termite.color, -1)
                 cv2.circle(frame, position, 8, termite.color, 2)
+                cv2.putText(frame, 'w'+termite.label[-1], (position[0]-7, position[1]-11), 2, color=termite.color,
+                            fontScale=0.4)
+
+                f_trail = termite.trail.iloc[step:min(len(self.termites[0].trail), step+5)]
+                for future in f_trail.itertuples():
+                    cv2.circle(frame, (int(future.x), int(future.y)), 2,
+                               termite.color, -1)
+
+                p_trail = termite.trail.iloc[max(0, step-5):step]
+                for past in p_trail.itertuples():
+                    cv2.circle(frame, (int(past.x), int(past.y)), 2,
+                               termite.color, -1)
+
+
                 cv2.putText(frame, 'Frame #{} of {}, {}ms delay.'.format(
                             int(video.get(cv2.CAP_PROP_POS_FRAMES)),
                             len(self.termites[0].trail),

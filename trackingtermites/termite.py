@@ -38,3 +38,14 @@ class Termite:
             None.
         '''
         self.trail = pd.read_csv(source_path)
+
+    def normalize(self):
+        '''Adjust x and y components to center of bounding box prediction.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        self.trail['x'] = self.trail['x'] + self.trail['xoffset']/2
+        self.trail['y'] = self.trail['y'] + self.trail['yoffset']/2
