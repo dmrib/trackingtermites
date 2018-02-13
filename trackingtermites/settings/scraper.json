@@ -8,5 +8,6 @@
     "resize_ratio": 0.5,
     "movie_speed": 1,
     "collection_edge": 30,
-    "distance_threshold": 60
+    "distance_threshold": 60,
+    "images_folder": "data/Images/"
 }
