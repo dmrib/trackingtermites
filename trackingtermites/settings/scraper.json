@@ -9,5 +9,9 @@
     "movie_speed": 1,
     "collection_edge": 30,
     "distance_threshold": 60,
-    "images_folder": "data/Images/"
+    "images_folder": "data/Images/",
+    "events": {"q": "head-head",
+               "w": "head-abdomem",
+               "e": "regular-encounter"
+              }
 }

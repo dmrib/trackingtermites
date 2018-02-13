@@ -95,6 +95,9 @@ class Scraper():
         Returns:
             None.
         '''
+        if not os.path.exists(self.settings['output_path']):
+            os.makedirs(self.settings['output_path'])
+
         entries_number = len(self.termites[0].trail['frame'].values)
 
         for frame_number in range(1, entries_number):
@@ -141,6 +144,19 @@ class Labeler():
         with open(settings_file) as settings:
             self.settings = json.load(settings)
 
+    def _create_collections(self):
+        '''Create labeled images folders.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        for event in self.settings['events'].values():
+            folder_name = os.path.join(self.settings['images_folder'], event)
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+
     def collect_paths(self):
         '''Get all images paths in the images folder.
 
@@ -159,10 +175,18 @@ class Labeler():
         Returns:
             None.
         '''
-        for path in self.paths:
+        self._create_collections()
+        for image_id, path in enumerate(self.paths):
+            print(path)
             frame = cv2.imread(path)
             cv2.imshow('Labeling', frame)
             pressed_key = cv2.waitKey(0) & 0xff
+            if chr(pressed_key) in self.settings['events']:
+                path = os.path.join(self.settings['images_folder'],
+                                    self.settings['events'][chr(pressed_key)] +
+                                    '/' + str(image_id) + '.jpg')
+                cv2.imwrite(path, frame)
+
             if pressed_key == 27:
                 sys.exit()
 
