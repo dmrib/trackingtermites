@@ -7,7 +7,7 @@ import sys
 import termite as trmt
 
 
-class LabelingSession():
+class Scraper():
     def __init__(self, settings_path):
         '''Initializer.
 
@@ -118,5 +118,5 @@ class LabelingSession():
 
 
 if __name__ == '__main__':
-    labeling = LabelingSession('settings/scraper.json')
-    labeling.scrape()
+    scraper = Scraper('settings/scraper.json')
+    scraper.scrape()
