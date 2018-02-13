@@ -1,11 +1,12 @@
 {
     "experiment_name": "Sample Experiment",
+    "source_folder": "data/Sample Experiment",
     "conducted_by": "UFV Termitology Lab",
     "video_path": "data/sample.mp4",
-    "tracking_method": "KCF",
-    "output_path": "data/",
+    "output_path": "data/Images/",
     "n_termites": 4,
     "resize_ratio": 0.5,
     "movie_speed": 1,
-    "rewind_steps": 15
+    "collection_edge": 30,
+    "distance_threshold": 60
 }

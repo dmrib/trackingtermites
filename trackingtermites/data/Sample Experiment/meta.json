@@ -1,11 +1,11 @@
 {
-    "date": "2018-02-06 21:19:57",
     "resize_ratio": 0.5,
-    "conducted_by": "UFV Termitology Lab",
+    "n_termites": 4,
     "movie_fps": 30.0,
+    "conducted_by": "UFV Termitology Lab",
     "tracking_method": "KCF",
+    "movie_name": "sample.mp4",
     "experiment_name": "Sample Experiment",
     "video_path": "data/sample.mp4",
-    "movie_name": "sample.mp4",
-    "n_termites": 4
+    "date": "2018-02-11 17:23:08"
 }
