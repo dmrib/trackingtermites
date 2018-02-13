@@ -120,7 +120,7 @@ class Scraper():
                         cv2.imwrite(self.settings['output_path']+'{}-t{}-t{}.jpg'.format(frame_number, n_termite, other), event)
 
 
-class Labeler():
+class OfflineLabeler():
     def __init__(self, settings_file):
         '''Initializer.
 
@@ -165,7 +165,28 @@ class Labeler():
         Returns:
             None.
         '''
-        self.paths = [x for x in glob.glob(self.settings['images_folder']+'*')]
+        self.paths = [x for x in glob.glob(self.settings['images_folder']+'*.jpg')]
+
+    def augment_dataset(self):
+        '''Artificially augment dataset.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
+        print('Augmenting dataset...')
+        for folder in self.settings['events'].values():
+            labeled = glob.glob(os.path.join(self.settings['images_folder'],
+                                folder + '/*.jpg'))
+            for image in labeled:
+                frame = cv2.imread(image)
+                artificial = cv2.flip(frame, 0)
+                cv2.imwrite(image[:-4]+'-a1'+image[-4:], artificial)
+                artificial = cv2.flip(frame, 1)
+                cv2.imwrite(image[:-4]+'-a2'+image[-4:], artificial)
+                artificial = cv2.flip(artificial, 0)
+                cv2.imwrite(image[:-4]+'-a3'+image[-4:], artificial)
 
     def label(self):
         '''Start hand labeling loop.
@@ -195,5 +216,6 @@ if __name__ == '__main__':
     scraper = Scraper('settings/scraper.json')
     scraper.scrape()
 
-    labeler = Labeler('settings/scraper.json')
+    labeler = OfflineLabeler('settings/scraper.json')
     labeler.label()
+    labeler.augment_dataset()
