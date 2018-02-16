@@ -179,24 +179,30 @@ class NetworkVisualization(TrackingVisualization):
         '''
         self._compute_distances()
         for frame_number in range(1, len(self.termites[0].trail['frame'])):
-            playing, frame = self.video.read()
-            frame = cv2.resize(frame, (0,0), fx=self.settings['resize_ratio'],
+            playing, self.frame = self.video.read()
+            self._draw_frame_info()
+            self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
                                fy=self.settings['resize_ratio'])
 
             for n_termite in range(len(self.termites)):
                 predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
-                cv2.circle(frame, predicted, 3, self.termites[n_termite].color, -1)
-                cv2.putText(frame, self.termites[n_termite].trail.loc[frame_number,'label'], (predicted[0]+5, predicted[1]+5), 2,
+                cv2.circle(self.frame, predicted, 3, self.termites[n_termite].color, -1)
+                cv2.putText(self.frame, self.termites[n_termite].trail.loc[frame_number,'label'], (predicted[0]+5, predicted[1]+5), 2,
                             color=self.termites[n_termite].color, fontScale=0.3)
                 for other in range(n_termite+1, len(self.termites)):
                     other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
-                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 50:
-                        cv2.line(frame, predicted, other_predicted, (0,0,255), 1)
+                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 65:
+                        cv2.line(self.frame, predicted, other_predicted, (0,0,255), 1)
                         half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
-                        cv2.circle(frame, half, 3, (255, 0, 0), -1)
+                        cv2.circle(self.frame, half, 3, (255, 0, 0), -1)
 
-            cv2.imshow('Labeling...', frame)
-            encouter_label = cv2.waitKey(10) & 0xff
+            self.out.write(self.frame)
+            print(frame_number)
+            cv2.imshow('Labeling...', self.frame)
+            pressed_key = cv2.waitKey(1) & 0xff
+            if pressed_key == 27:
+                sys.exit()
+
 
 if __name__ == '__main__':
     vis = NetworkVisualization('settings/visualization.json')
