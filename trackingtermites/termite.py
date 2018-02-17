@@ -119,6 +119,7 @@ class Nest():
                     other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
                     if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < thresold:
                         self.termites[n_termite].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[other].trail.loc[0, 'label'])] = 'encountering'
+                        self.termites[other].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[n_termite].trail.loc[0, 'label'])] = 'encountering'
 
     def save(self, output_path):
         '''Save termite data in output path.
@@ -128,6 +129,9 @@ class Nest():
         Returns:
             None.
         '''
+        output_path = os.path.join(output_path, 'Expanded')
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         for termite in self.termites:
             termite.to_csv(os.path.join(output_path, termite.trail.loc[0, 'label']+'.csv'))
 

@@ -197,7 +197,6 @@ class NetworkVisualization(TrackingVisualization):
                         cv2.circle(self.frame, half, 3, (255, 0, 0), -1)
 
             self.out.write(self.frame)
-            print(frame_number)
             cv2.imshow('Labeling...', self.frame)
             pressed_key = cv2.waitKey(1) & 0xff
             if pressed_key == 27:
