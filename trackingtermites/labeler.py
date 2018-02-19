@@ -106,6 +106,63 @@ class OfflineLabeler():
                 sys.exit()
 
 
+class OnlineLabeler():
+    def __init__(self, settings_file):
+        self._load_settings(settings_file)
+        self._load_termites()
+        self.focal = self.settings['focal'] - 1
+        self.video = cv2.VideoCapture(self.settings['video_path'])
+
+    def _load_settings(self, settings_file):
+        '''Load labeling session settings file.
+
+        Args:
+            settings_file (str): path to tracking session settings file.
+        Retuns:
+            None.
+        '''
+        with open(settings_file) as settings:
+            self.settings = json.load(settings)
+
+    def _load_termites(self):
+        self.nest = trmt.Nest(self.settings['n_termites'], self.settings['source_folder'])
+        self.nest.normalize()
+        self.nest.compute_distances()
+        self.nest.compute_encounters(65)
+
+    def label(self):
+        frames_number = len(self.nest.termites[0].trail['label'])
+        for f_number in range(1, frames_number):
+            playing, frame = self.video.read()
+            if not playing:
+                sys.exit()
+            frame = cv2.resize(frame, (0,0), fy=0.5, fx=0.5)
+            t_pos = (int(self.nest.termites[self.focal].trail.loc[f_number, 'x']), int(self.nest.termites[self.focal].trail.loc[f_number, 'y']))
+            cv2.circle(frame, t_pos, 3, self.nest.termites[self.focal].color, -1)
+            cv2.putText(frame, 'Focal', (t_pos[0]-7, t_pos[1]-11), 2,
+                        color=self.nest.termites[self.focal].color,
+                        fontScale=0.4)
+            for other in range(len(self.nest.termites)):
+                if other != self.focal:
+                    other_pos = (int(self.nest.termites[other].trail.loc[f_number, 'x']), int(self.nest.termites[other].trail.loc[f_number, 'y']))
+                    if self.nest.termites[self.focal].trail.loc[f_number, 'distance_to_{}'.format(self.nest.termites[other].trail.loc[0, 'label'])] < 65:
+                        half = ((t_pos[0]+other_pos[0])//2, (t_pos[1]+other_pos[1])//2)
+                        event = frame[(half[1]-30):(half[1]+30),
+                                      (half[0]-30):(half[0]+30)]
+                        event = cv2.resize(event, (0,0), fy=2, fx=2)
+                        edges = cv2.Canny(event, 75, 75)
+                        edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+                        full = np.hstack((edges, event))
+                        frame[0:full.shape[0], 0:full.shape[1]] = full
+                        cv2.imshow('Encounters', frame)
+                        pressed_key = cv2.waitKey(0) & 0xff
+                        if pressed_key == 27:
+                            sys.exit()
+                        elif chr(pressed_key) in self.settings['events'].keys():
+                            self.nest.termites[self.focal].trail.loc[f_number, 'interaction_with_{}'.format(self.nest.termites[other].trail.loc[0, 'label'])] = self.settings['events'][chr(pressed_key)]
+        self.nest.save(self.settings['source_folder'])
+
+
 if __name__ == '__main__':
-    labeler = OfflineLabeler('settings/labeler.json')
+    labeler = OnlineLabeler('settings/labeler.json')
     labeler.label()

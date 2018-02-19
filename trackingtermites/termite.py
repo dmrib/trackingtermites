@@ -115,7 +115,7 @@ class Nest():
         '''
         number_of_frames = len(self.termites[0].trail['frame'])
         for frame_number in range(1, number_of_frames):
-            print('Computing encounters on frame {} of {}.'.format(frame_number, number_of_frames))
+            print('Computing encounters on frame {} of {}.'.format(frame_number, number_of_frames-1))
             for n_termite in range(len(self.termites)):
                 predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
                 for other in range(n_termite+1, len(self.termites)):
