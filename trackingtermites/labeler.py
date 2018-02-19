@@ -160,6 +160,10 @@ class OnlineLabeler():
                 if other != self.focal:
                     other_pos = (int(self.nest.termites[other].trail.loc[f_number, 'x']), int(self.nest.termites[other].trail.loc[f_number, 'y']))
                     if self.nest.termites[self.focal].trail.loc[f_number, 'distance_to_{}'.format(self.nest.termites[other].trail.loc[0, 'label'])] < 65:
+                        cv2.circle(frame, other_pos, 3, self.nest.termites[other].color, -1)
+                        cv2.putText(frame, 'Other', (other_pos[0]-7, other_pos[1]-11), 2,
+                                    color=self.nest.termites[other].color,
+                                    fontScale=0.4)
                         half = ((t_pos[0]+other_pos[0])//2, (t_pos[1]+other_pos[1])//2)
                         event = frame[(half[1]-30):(half[1]+30),
                                       (half[0]-30):(half[0]+30)]
