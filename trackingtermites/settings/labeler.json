@@ -3,10 +3,15 @@
     "source_folder": "data/Sample Experiment",
     "conducted_by": "UFV Termitology Lab",
     "video_path": "data/sample.mp4",
-    "output_path": "data/Sample Experiment/Images/raw/",
+    "output_path": "data/Sample Experiment/Images/",
     "n_termites": 4,
     "resize_ratio": 0.5,
     "movie_speed": 1,
     "collection_edge": 30,
-    "distance_threshold": 60
+    "distance_threshold": 60,
+    "images_folder": "data/Sample Experiment/Images/raw/",
+    "events": {"q": "head-head",
+               "w": "head-abdomem",
+               "e": "regular-encounter"
+              }
 }
