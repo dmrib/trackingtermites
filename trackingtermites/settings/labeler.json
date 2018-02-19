@@ -1,6 +1,7 @@
 {
     "experiment_name": "Sample Experiment",
     "source_folder": "data/Sample Experiment",
+    "focal": 1,
     "conducted_by": "UFV Termitology Lab",
     "video_path": "data/sample.mp4",
     "output_path": "data/Sample Experiment/Images/",
