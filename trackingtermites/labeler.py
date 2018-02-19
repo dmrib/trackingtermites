@@ -89,7 +89,12 @@ class OfflineLabeler():
         for image_id, path in enumerate(self.paths):
             print('Image {} of {}'.format(image_id+1, number_of_images))
             frame = cv2.imread(path)
-            cv2.imshow('Labeling', frame)
+            edges = cv2.Canny(frame, 75, 75)
+            edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+            evaluation = np.hstack((frame, edges))
+            evaluation = cv2.resize(evaluation, (0,0), fx=5,
+                                                fy=5)
+            cv2.imshow('Labeling', evaluation)
             pressed_key = cv2.waitKey(0) & 0xff
             if chr(pressed_key) in self.settings['events']:
                 path = os.path.join(self.settings['output_path'],

@@ -61,9 +61,13 @@ class TrackingVisualization():
         self.video = cv2.VideoCapture(self.settings['video_path'])
         self.shape = (int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH)*self.settings['resize_ratio']),
                       int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)*self.settings['resize_ratio']))
-        self.out = cv2.VideoWriter('{}/{}.avi'.format(self.settings['source_folder'],
-                              self.settings['experiment_name']),
-                              cv2.VideoWriter_fourcc(*'MJPG'), 30.0, self.shape)
+
+        output_path = os.path.join(self.settings['source_folder'], 'Videos')
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        self.out = cv2.VideoWriter(output_path + '/last.avi',
+                                   cv2.VideoWriter_fourcc(*'MJPG'), 30.0,
+                                   self.shape)
 
     def _adjust_predictions(self):
         '''Adjust termites x and y components to better postion predictions.
@@ -149,6 +153,7 @@ class TrackingVisualization():
             pressed_key = cv2.waitKey(self.settings['movie_speed']) & 0xff
             if pressed_key == 27:
                 sys.exit()
+        cv2.destroyAllWindows()
 
 
 class NetworkVisualization(TrackingVisualization):
@@ -201,8 +206,11 @@ class NetworkVisualization(TrackingVisualization):
             pressed_key = cv2.waitKey(1) & 0xff
             if pressed_key == 27:
                 sys.exit()
+        cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
+    vis = TrackingVisualization('settings/visualization.json')
+    vis.show()
     vis = NetworkVisualization('settings/visualization.json')
     vis.show()

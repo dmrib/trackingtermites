@@ -97,6 +97,7 @@ class Nest():
             None.
         '''
         for a_number, termite_a in enumerate(self.termites, start=1):
+            print('Computing distances of termite {} of {}.'.format(a_number, len(self.termites)))
             for b_number, termite_b in enumerate(self.termites, start=1):
                 if a_number != b_number:
                     distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
@@ -112,7 +113,9 @@ class Nest():
         Returns:
             None.
         '''
-        for frame_number in range(1, len(self.termites[0].trail['frame'])):
+        number_of_frames = len(self.termites[0].trail['frame'])
+        for frame_number in range(1, number_of_frames):
+            print('Computing encounters on frame {} of {}.'.format(frame_number, number_of_frames))
             for n_termite in range(len(self.termites)):
                 predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
                 for other in range(n_termite+1, len(self.termites)):

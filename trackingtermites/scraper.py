@@ -116,7 +116,8 @@ class Scraper():
                         half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
                         event = frame[(half[1]-self.settings['collection_edge']):(half[1]+self.settings['collection_edge']),
                                       (half[0]-self.settings['collection_edge']):(half[0]+self.settings['collection_edge'])]
-                        cv2.imwrite(self.settings['output_path']+'{}-t{}-t{}.jpg'.format(frame_number, n_termite, other), event)
+                        cv2.imwrite(os.path.join(self.settings['output_path'],
+                                    '{}-t{}-t{}.jpg'.format(frame_number, n_termite, other)), event)
 
 
 if __name__ == '__main__':
