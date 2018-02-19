@@ -125,12 +125,26 @@ class OnlineLabeler():
             self.settings = json.load(settings)
 
     def _load_termites(self):
+        '''Load termite data from source folder.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         self.nest = trmt.Nest(self.settings['n_termites'], self.settings['source_folder'])
         self.nest.normalize()
         self.nest.compute_distances()
         self.nest.compute_encounters(65)
 
     def label(self):
+        '''Start labeling session.
+
+        Args:
+            None.
+        Returns:
+            None.
+        '''
         frames_number = len(self.nest.termites[0].trail['label'])
         for f_number in range(1, frames_number):
             playing, frame = self.video.read()
