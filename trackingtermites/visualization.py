@@ -185,9 +185,9 @@ class NetworkVisualization(TrackingVisualization):
         self._compute_distances()
         for frame_number in range(1, len(self.termites[0].trail['frame'])):
             playing, self.frame = self.video.read()
-            self._draw_frame_info()
             self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
                                fy=self.settings['resize_ratio'])
+            self._draw_frame_info()
 
             for n_termite in range(len(self.termites)):
                 predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
@@ -211,6 +211,4 @@ class NetworkVisualization(TrackingVisualization):
 
 if __name__ == '__main__':
     vis = TrackingVisualization('settings/visualization.json')
-    vis.show()
-    vis = NetworkVisualization('settings/visualization.json')
     vis.show()
