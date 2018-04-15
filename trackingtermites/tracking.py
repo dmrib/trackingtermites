@@ -237,7 +237,7 @@ class TermiteTracker:
             json.dump(self.meta, output_file, indent=4)
         for termite in self.termites:
             trail = pd.DataFrame(termite.trail)
-            trail = pd.DataFrame('frame')
+            trail = trail.set_index('frame')
             trail.to_csv('{}/{}-trail.csv'.format(output_path, termite.label))
 
     def _create_meta(self):
