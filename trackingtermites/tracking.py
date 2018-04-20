@@ -1,291 +1,169 @@
 import cv2
-import datetime
 import json
 import os
-import sys
-import termite as trmt
-import time
-
 import pandas as pd
+import pims
+import sys
+import random
 
 
-class TermiteTracker:
-    def __init__(self, settings_file_path):
-        '''Initializer.
+class Termite:
+    def __init__(self, number, caste):
+        self.number = number
+        self.caste = caste
+        self.color = [random.randint(0,256),
+                      random.randint(0,256),
+                      random.randint(0,256)]
+        self.trail = []
+        self.tracker = None
 
-        Args:
-            settings_file_path (str): path to tracking session settings file.
-        Returns:
-            None.
-        '''
-        self._load_settings(settings_file_path)
+    def __repr__(self):
+        return f'{self.caste}{self.number}, {len(self.trail)} steps collected.'
+
+    @property
+    def label(self):
+        return f'{self.caste}{self.number}'
+
+class GeneralTracker:
+    def __init__(self, config_path):
+        with open(config_path) as config_file:
+            self.config = json.load(config_file)
+        self.video = self.load_video(self.config['video_path'])
+        self.current_frame = self.config['starting_frame'] + 1
+        self.n_samples = self.config['n_termites']
         self.termites = []
-        self.video = None
-        self.frame = None
-        self.playing = False
 
-    def _load_settings(self, settings_file_path):
-        '''Load tracking session settings.
+        self.create_termites()
 
-        Args:
-            settings_file_path (str): path to tracking session settings file.
-        Returns:
-            None.
-        '''
-        with open(settings_file_path) as settings_file:
-            self.settings = json.load(settings_file)
-
-    def _load_video(self):
-        '''Load experiment video.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        self.video = cv2.VideoCapture(self.settings['video_path'])
-        if not self.video.isOpened:
-            print('Could not find the video file.')
+    def load_video(self, video_path):
+        try:
+            return pims.Video(video_path)
+        except FileNotFoundError:
+            print('Video file not found.')
             sys.exit()
 
-        self.playing, self.frame = self.video.read()
-        if not self.playing:
-            print('Could not start video.')
-            sys.exit()
-        self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
-                                fy=self.settings['resize_ratio'])
-
-    def _read_next_frame(self):
-        '''Read next frame from current video.
-
-        Args:
-            None.
-        Returns:
-            self.playing (bool): True if next frame was read successfuly.
-        '''
-        self.playing, self.frame = self.video.read()
-        if not self.playing:
-            return self.playing
-        self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
-                                fy=self.settings['resize_ratio'])
-        return self.playing
-
-    def _select_termites(self):
-        '''Open UI tool for selecting termites on current frame, create termite
-           representation and append to termites list.
-
-        Args:
-            None.
-        Return:
-            None.
-        '''
-        for i in range(1, self.settings['n_termites']+1):
-            termite = trmt.Termite('t' + str(i))
-            termite.tracker = cv2.Tracker_create(self.settings['tracking_method'])
-            termite_pos = cv2.selectROI('Select the termite...', self.frame,
-                                        False, False)
-            origin = (int(termite_pos[0]), int(termite_pos[1]))
-            end = (int(termite_pos[0] + termite_pos[2]),
-                   int(termite_pos[1] + termite_pos[3]))
-            cv2.rectangle(self.frame, origin, end, termite.color, 2)
+    def create_termites(self, query_caste=False):
+        frame = self.get_frame(self.config['starting_frame'])
+        for t_number in range(1, self.n_samples + 1):
+            if query_caste:
+                caste = input('Termite caste: ')
+            else:
+                caste = 'T'
+            termite = Termite(t_number, caste)
+            initial_position = self.select_termite(frame)
+            termite.tracker = cv2.Tracker_create(self.config['tracking_method'])
+            termite.tracker.init(frame, initial_position)
 
             termite.trail.append({'label': termite.label,
-                                 'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
-                                 'time': time.strftime("%H:%M:%S",
-                                 time.gmtime(int(self.video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                 'x': termite_pos[0],
-                                 'y': termite_pos[1],
-                                 'xoffset': termite_pos[2],
-                                 'yoffset': termite_pos[3]})
+                                 'frame': self.config['starting_frame'],
+                                 'x': initial_position[0],
+                                 'y': initial_position[1],
+                                 'xoffset': initial_position[2],
+                                 'yoffset': initial_position[3]})
 
-            termite.tracker.init(self.frame, termite_pos)
-            cv2.destroyWindow('Select the termite...')
             self.termites.append(termite)
 
-    def _update_positions(self):
-        '''Compute termite position on frame using the tracker output and
-           append to the termite's trail.
+    def select_termite(self, frame):
+        position = cv2.selectROI('Select the termite...', frame, False, False)
+        position = tuple([int(x) for x in position])
+        origin = (int(position[0]), int(position[1]))
+        end = (int(position[0] + position[2]),
+               int(position[1] + position[3]))
+        cv2.rectangle(frame, origin, end, (0, 256, 0), 2)
+        cv2.destroyAllWindows()
+        return position
 
-        Args:
-            None.
-        Returns:
-            None.
-        '''
+    def update_termites(self, frame):
         for termite in self.termites:
-            found, termite_pos = termite.tracker.update(self.frame)
+            found, position = termite.tracker.update(frame)
+            position = [int(x) for x in position]
             if not found:
                 print('Termite lost.')
             else:
                 termite.trail.append({'label': termite.label,
-                                     'frame': int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
-                                     'time': time.strftime("%H:%M:%S",
-                                     time.gmtime(int(self.video.get(cv2.CAP_PROP_POS_MSEC)/1000))),
-                                     'x': termite_pos[0],
-                                     'y': termite_pos[1],
-                                     'xoffset': termite_pos[2],
-                                     'yoffset': termite_pos[3]})
+                                     'frame': self.current_frame,
+                                     'x': position[0],
+                                     'y': position[1],
+                                     'xoffset': position[2],
+                                     'yoffset': position[3]})
 
-    def _draw_boxes(self):
-        '''Draw box on current frame representing a termite current predicted
-           region.
+    def restart_tracker(self, frame):
+        to_restart = int(input('Termite number: ')) - 1
+        position = self.select_termite(frame)
+        self.termites[to_restart].tracker = cv2.Tracker_create(self.config['tracking_method'])
+        self.termites[to_restart].tracker.init(frame, position)
+        self.termites[to_restart].trail[-1] = {'label': self.termites[to_restart].label,
+                                               'frame': 0,
+                                               'x': position[0],
+                                               'y': position[1],
+                                               'xoffset': position[2],
+                                               'yoffset': position[3]}
 
-        Args:
-            None.
-        Returns:
-            None.
-        '''
+    def rewind(self, n_steps):
+        self.current_frame = max(self.config['starting_frame'], self.current_frame - n_steps - 1)
+        frame = self.get_frame(self.current_frame)
         for termite in self.termites:
-            origin = (int(termite.trail[-1]['x']), int(termite.trail[-1]['y']))
-            end = (int(termite.trail[-1]['x'] + termite.trail[-1]['xoffset']),
-                   int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']))
-            predicted = (int(termite.trail[-1]['x'] + termite.trail[-1]['xoffset']/2),
-                         int(termite.trail[-1]['y'] + termite.trail[-1]['yoffset']/2))
-            cv2.rectangle(self.frame, origin, end, termite.color, 2)
-            cv2.circle(self.frame, predicted, 3, termite.color, -1)
-            cv2.putText(self.frame, termite.label, (end[0]+5, end[1]+5), 2,
+            termite.trail = termite.trail[:max(1, len(termite.trail) - n_steps - 1)]
+            termite.tracker = cv2.Tracker_create(self.config['tracking_method'])
+            termite.tracker.init(frame, (termite.trail[-1]['x'],
+                                        termite.trail[-1]['y'],
+                                        termite.trail[-1]['xoffset'],
+                                        termite.trail[-1]['yoffset']))
+
+    def draw_boxes(self, frame):
+        for termite in self.termites:
+            origin = (termite.trail[-1]['x'], termite.trail[-1]['y'])
+            end = (termite.trail[-1]['x'] + termite.trail[-1]['xoffset'],
+                   termite.trail[-1]['y'] + termite.trail[-1]['yoffset'])
+            predicted = (termite.trail[-1]['x'] + termite.trail[-1]['xoffset']//2,
+                         termite.trail[-1]['y'] + termite.trail[-1]['yoffset']//2)
+            cv2.rectangle(frame, origin, end, termite.color, 2)
+            cv2.circle(frame, predicted, 3, termite.color, -1)
+            cv2.putText(frame, termite.label, (end[0]+5, end[1]+5), 2,
                         color=termite.color, fontScale=0.3)
 
-    def _draw_frame_info(self):
-        '''Write frame meta info on the current frame.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        cv2.putText(self.frame, 'Frame #{}, of {} {}ms delay.'.format(
-                    int(self.video.get(cv2.CAP_PROP_POS_FRAMES)),
-                    int(self.video.get(cv2.CAP_PROP_FRAME_COUNT)),
-                    self.settings['movie_speed']), (5,10), 1, color=(0, 0, 255),
-                    fontScale=0.7)
-
-    def _process_event(self, pressed_key):
-        '''Process a key press triggered event on tracking loop.
-
-        Args:
-            None.
-        Returns:
-            True (bool): indicates that the tracking session should go on.
-        '''
-        if pressed_key == 27:
-            return False
-        elif pressed_key == ord('p'):
-            cv2.waitKey(0)
-        elif pressed_key == ord('.'):
-            self.settings['movie_speed'] = max(1, self.settings['movie_speed'] - 10)
-        elif pressed_key == ord(','):
-            self.settings['movie_speed'] += 10
-        elif pressed_key == ord('r'):
-            self._correct_termite()
-        elif pressed_key == ord('w'):
-            self._rewind()
-        elif pressed_key == ord('s'):
-            self._write_output(self.settings['output_path'])
-        return True
-
-    def _correct_termite(self):
-        '''Correct termite position and restart tracker.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        to_correct = int(input('Termite number: '))
-        new_position = cv2.selectROI('Select the termite...', self.frame,
-                                     False, False)
-        cv2.destroyWindow('Select the termite...')
-        self.termites[to_correct-1].tracker = cv2.Tracker_create(
-                                              self.settings['tracking_method'])
-        self.termites[to_correct-1].tracker.init(self.frame, new_position)
-
-    def _rewind(self):
-        '''Rewind tracking experiment.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        for termite in self.termites:
-            termite.trail = termite.trail[:max(1, len(termite.trail) -
-                            self.settings['rewind_steps'])]
-            termite.tracker = cv2.Tracker_create('KCF')
-            termite.tracker.init(self.frame, (termite.trail[-1]['x'],
-                                 termite.trail[-1]['y'],
-                                 termite.trail[-1]['xoffset'],
-                                 termite.trail[-1]['yoffset']))
-        self.video.set(cv2.CAP_PROP_POS_FRAMES,
-                       max(1, self.video.get(cv2.CAP_PROP_POS_FRAMES) -
-                              self.settings['rewind_steps']))
-
-    def _write_output(self, output_path):
-        '''Write termites' tracking output to csv file.
-
-        Args:
-            output_path (str): destination path to the csv file.
-        Return:
-            None.
-        '''
-        self._create_meta()
-
-        output_path = os.path.join(self.settings['output_path'] +
-                                   self.settings['experiment_name'])
+    def write_output(self):
+        output_path = os.path.join(self.config['output_path'],
+                                   self.config['experiment_name'])
         if not os.path.exists(output_path):
             os.makedirs(output_path)
-        with open(output_path+'/meta.json', mode='w') as output_file:
-            json.dump(self.meta, output_file, indent=4)
         for termite in self.termites:
             trail = pd.DataFrame(termite.trail)
             trail = trail.set_index('frame')
-            trail.to_csv('{}/{}-trail.csv'.format(output_path, termite.label))
+            trail.to_csv(f'{output_path}/{termite.label}-trail.csv')
 
-    def _create_meta(self):
-        '''Create experiment description file.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        self.meta = {k: self.settings[k] for k in ('experiment_name',
-                     'conducted_by', 'tracking_method', 'n_termites',
-                     'resize_ratio', 'video_path', 'resize_ratio')}
-        self.meta['movie_name'] = os.path.basename(self.settings['video_path'])
-        self.meta['date'] = '{}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        self.meta['movie_fps'] = self.video.get(cv2.CAP_PROP_FPS)
+    def get_frame(self, frame_number):
+        frame = self.video[frame_number]
+        frame = cv2.resize(frame, (0,0), fx=self.config['resize_ratio'],
+                           fy=self.config['resize_ratio'])
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        cv2.putText(frame, f'Frame #{self.current_frame} of {len(self.video)} - {self.config["speed"]}ms delay.',
+                    (5,10), 1, color=(0, 0, 255), fontScale=0.7)
+        return frame
 
     def track(self):
-        '''Tracking loop.
+        while self.current_frame < len(self.video):
+            frame = self.get_frame(self.current_frame)
+            self.update_termites(frame)
+            self.draw_boxes(frame)
 
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        self._load_video()
-        self._select_termites()
+            cv2.imshow('Tracking...', frame)
+            command = cv2.waitKey(self.config['speed'])
+            if command == 27:
+                cv2.destroyAllWindows()
+                sys.exit()
+            elif command == ord('q'):
+                self.restart_tracker(frame)
+            elif command == ord('w'):
+                self.rewind(self.config['rewind_steps'])
+            elif command == ord('.'):
+                self.config['speed'] = max(1, self.config['speed'] - 50)
+            elif command == ord(','):
+                self.config['speed'] += 50
 
-        # Tracking loop
-        while True:
-            if not self._read_next_frame():
-                break
-            self._update_positions()
-            self._draw_boxes()
-            self._draw_frame_info()
+            self.current_frame += 1
+        self.write_output()
+        print(self.termites)
 
-            # Show current frame
-            cv2.imshow('Tracking...', self.frame)
-
-            # Check and processs pressed keys events
-            pressed_key = cv2.waitKey(self.settings['movie_speed']) & 0xff
-            go_on = self._process_event(pressed_key)
-            if not go_on:
-                break
-
-        self._write_output(self.settings['output_path'])
-
-
-if __name__ == '__main__':
-    tracker = TermiteTracker('settings/tracking.json')
-    tracker.track()
+tracker = GeneralTracker('settings/tracking.json')
+tracker.track()
