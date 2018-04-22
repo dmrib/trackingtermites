@@ -2,54 +2,38 @@ import numpy as np
 import os
 import pandas as pd
 import random
-import termite as trmt
 
 random.seed(42)
 
 class Termite:
-    def __init__(self, label):
-        '''Initializer.
-
-        Args:
-            label (str): termite identification label.
-            color (tuple): BGR termite color code.
-        Returns:
-            None.
-        '''
-        self.label = label
+    def __init__(self, caste, number):
+        self.caste = caste
+        self.number = number
         self.color = (random.randint(1,256), random.randint(1,256),
                       random.randint(1,256))
         self.trail = []
         self.tracker = None
 
-    def to_csv(self, output_path):
-        '''Write termite tracker output data to csv file.
+    def __repr__(self):
+        return f'{self.label}, {len(self.trail)} steps collected.'
 
-        Args:
-            output_path (str): destination path to output file.
-        Returns:
-            None.
-        '''
-        self.trail.to_csv(output_path, index=False, float_format='%.1f')
+    @property
+    def label(self):
+        return f'{self.caste}{self.number}'
+
+    def to_dataframe(self):
+        self.trail = pd.DataFrame(self.trail)
+        self.trail = self.trail.set_index('frame')
+
+    def to_csv(self, output_path):
+        self.to_dataframe()
+        self.trail.to_csv(f'{output_path}/{self.label}-trail.csv',
+                     float_format='%.1f')
 
     def from_csv(self, source_path):
-        '''Load termite data from csv file into pandas dataframe.
-
-        Args:
-            source_path (str): path to data source file.
-        Returns:
-            None.
-        '''
         self.trail = pd.read_csv(source_path)
 
     def normalize(self):
-        '''Adjust x and y components to center of bounding box prediction.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
         self.trail['x'] = self.trail['x'] + self.trail['xoffset']/2
         self.trail['y'] = self.trail['y'] + self.trail['yoffset']/2
 

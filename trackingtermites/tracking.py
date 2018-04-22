@@ -1,28 +1,15 @@
 import cv2
+import datetime
 import json
 import os
 import pandas as pd
 import pims
-import sys
 import random
+import sys
+import time
 
+import termite as trmt
 
-class Termite:
-    def __init__(self, number, caste):
-        self.number = number
-        self.caste = caste
-        self.color = [random.randint(0,256),
-                      random.randint(0,256),
-                      random.randint(0,256)]
-        self.trail = []
-        self.tracker = None
-
-    def __repr__(self):
-        return f'{self.caste}{self.number}, {len(self.trail)} steps collected.'
-
-    @property
-    def label(self):
-        return f'{self.caste}{self.number}'
 
 class GeneralTracker:
     def __init__(self, config_path):
@@ -42,20 +29,22 @@ class GeneralTracker:
             print('Video file not found.')
             sys.exit()
 
-    def create_termites(self, query_caste=False):
+    def create_termites(self):
         frame = self.get_frame(self.config['starting_frame'])
         for t_number in range(1, self.n_samples + 1):
-            if query_caste:
+            if self.config['query_caste']:
                 caste = input('Termite caste: ')
             else:
-                caste = 'T'
-            termite = Termite(t_number, caste)
+                caste = self.config['default_caste_label']
+            termite = trmt.Termite(caste, t_number)
             initial_position = self.select_termite(frame)
             termite.tracker = cv2.Tracker_create(self.config['tracking_method'])
             termite.tracker.init(frame, initial_position)
 
-            termite.trail.append({'label': termite.label,
-                                 'frame': self.config['starting_frame'],
+            termite.trail.append({'frame': self.config['starting_frame'],
+                                 'time': f'{time.strftime("%H:%M:%S", time.gmtime(self.current_frame/self.config["movie_fps"]))}',
+                                 'label': termite.label,
+                                 'caste': termite.caste,
                                  'x': initial_position[0],
                                  'y': initial_position[1],
                                  'xoffset': initial_position[2],
@@ -80,8 +69,10 @@ class GeneralTracker:
             if not found:
                 print('Termite lost.')
             else:
-                termite.trail.append({'label': termite.label,
-                                     'frame': self.current_frame,
+                termite.trail.append({'frame': self.current_frame,
+                                     'time': f'{time.strftime("%H:%M:%S", time.gmtime(self.current_frame/self.config["movie_fps"]))}',
+                                     'label': termite.label,
+                                     'caste': termite.caste,
                                      'x': position[0],
                                      'y': position[1],
                                      'xoffset': position[2],
@@ -92,8 +83,10 @@ class GeneralTracker:
         position = self.select_termite(frame)
         self.termites[to_restart].tracker = cv2.Tracker_create(self.config['tracking_method'])
         self.termites[to_restart].tracker.init(frame, position)
-        self.termites[to_restart].trail[-1] = {'label': self.termites[to_restart].label,
-                                               'frame': 0,
+        self.termites[to_restart].trail[-1] = {'frame': self.current_frame,
+                                               'time': f'{time.strftime("%H:%M:%S", time.gmtime(self.current_frame/self.config["movie_fps"]))}',
+                                               'label': self.termites[to_restart].label,
+                                               'caste': self.termites[to_restart].caste,
                                                'x': position[0],
                                                'y': position[1],
                                                'xoffset': position[2],
@@ -122,15 +115,28 @@ class GeneralTracker:
             cv2.putText(frame, termite.label, (end[0]+5, end[1]+5), 2,
                         color=termite.color, fontScale=0.3)
 
+    def print_summary(self):
+        for termite in self.termites:
+            print(f'{termite}')
+
     def write_output(self):
         output_path = os.path.join(self.config['output_path'],
                                    self.config['experiment_name'])
         if not os.path.exists(output_path):
             os.makedirs(output_path)
+        with open(os.path.join(output_path, 'meta.json'), mode='w') as metafile:
+            json.dump(self._create_meta(), metafile, indent=4)
         for termite in self.termites:
-            trail = pd.DataFrame(termite.trail)
-            trail = trail.set_index('frame')
-            trail.to_csv(f'{output_path}/{termite.label}-trail.csv')
+            termite.to_csv(output_path)
+
+    def _create_meta(self):
+        meta = {k: self.config[k] for k in ('experiment_name',
+                     'conducted_by', 'tracking_method', 'n_termites',
+                     'resize_ratio', 'video_path', 'movie_fps',
+                     'starting_frame')}
+        meta['movie_name'] = os.path.basename(self.config['video_path'])
+        meta['date'] = f'{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+        return meta
 
     def get_frame(self, frame_number):
         frame = self.video[frame_number]
@@ -152,10 +158,20 @@ class GeneralTracker:
             if command == 27:
                 cv2.destroyAllWindows()
                 sys.exit()
+            elif command == ord('w'):
+                cv2.waitKey(0)
             elif command == ord('q'):
                 self.restart_tracker(frame)
-            elif command == ord('w'):
+            elif command == ord('1'):
+                self.rewind(self.config['rewind_steps'] // 2)
+            elif command == ord('2'):
                 self.rewind(self.config['rewind_steps'])
+            elif command == ord('3'):
+                self.rewind(self.config['rewind_steps'] * 2)
+            elif command == ord('4'):
+                self.rewind(self.config['rewind_steps'] * 5)
+            elif command == ord('5'):
+                self.rewind(self.config['rewind_steps'] * 10)
             elif command == ord('.'):
                 self.config['speed'] = max(1, self.config['speed'] - 50)
             elif command == ord(','):
@@ -163,7 +179,7 @@ class GeneralTracker:
 
             self.current_frame += 1
         self.write_output()
-        print(self.termites)
+        self.print_summary()
 
 tracker = GeneralTracker('settings/tracking.json')
 tracker.track()
