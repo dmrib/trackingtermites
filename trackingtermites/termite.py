@@ -1,7 +1,10 @@
+import glob
 import numpy as np
 import os
 import pandas as pd
 import random
+
+import termite as trmt
 
 random.seed(42)
 
@@ -34,40 +37,24 @@ class Termite:
         self.trail = pd.read_csv(source_path)
 
     def normalize(self):
-        self.trail['x'] = self.trail['x'] + self.trail['xoffset']/2
-        self.trail['y'] = self.trail['y'] + self.trail['yoffset']/2
+        self.trail['x'] = self.trail['x'] + self.trail['xoffset']//2
+        self.trail['y'] = self.trail['y'] + self.trail['yoffset']//2
 
 
 class Nest():
-    def __init__(self, n_termites, source_folder):
+    def __init__(self, source_folder):
         self.termites = []
-        self.load_termites(n_termites, source_folder)
+        self.load_termites(source_folder)
 
-    def load_termites(self, n_termites, source_folder):
-        '''Load termite movement data files from source folder.
-
-        Args:
-            n_termites (int): number of termites files.
-            source_folder (str): path to folder with termite files.
-        Returns:
-            None.
-        '''
-        for termite_number in range(1, n_termites + 1):
-            label = 't' + str(termite_number)
-            file_name = '{}-trail.csv'.format(label)
-            file_path = os.path.join(source_folder, file_name)
-            termite = trmt.Termite(label)
-            termite.from_csv(file_path)
+    def load_termites(self, source_folder):
+        data_files = glob.glob(f'{source_folder}*.csv')
+        for data_file in data_files:
+            label = os.path.basename(data_file).split('-')[0]
+            termite = trmt.Termite(caste=label[0], number=int(label[1:]))
+            termite.from_csv(data_file)
             self.termites.append(termite)
 
     def normalize(self):
-        '''Adjust predicted points.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
         for termite in self.termites:
             termite.normalize()
             termite.trail = termite.trail.drop(columns=['xoffset', 'yoffset'])
@@ -109,23 +96,18 @@ class Nest():
                         self.termites[other].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[n_termite].trail.loc[0, 'label'])] = 'encountering'
 
     def save(self, output_path):
-        '''Save termite data in output path.
-
-        Args:
-            output_path (str): path to destination folder.
-        Returns:
-            None.
-        '''
         output_path = os.path.join(output_path, 'Expanded')
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         for termite in self.termites:
-            termite.to_csv(os.path.join(output_path, termite.trail.loc[0, 'label']+'.csv'))
+            termite.to_csv(output_path)
 
 
 if __name__ == '__main__':
-    nest = Nest(4, 'data/Sample Experiment/')
-    nest.normalize()
-    nest.compute_distances()
-    nest.compute_encounters(65)
-    nest.save('data/Sample Experiment/')
+    base_folder = '/media/dmrib/tdata/Syntermes/'
+    for experiment in os.listdir(base_folder):
+        for i in range(1,4):
+            file_path = f'{os.path.join(base_folder, experiment)}/{experiment}-{i}/'
+            nest = Nest(file_path)
+            nest.normalize()
+            nest.save(file_path)

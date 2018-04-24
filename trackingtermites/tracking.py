@@ -15,16 +15,16 @@ class GeneralTracker:
     def __init__(self, config_path):
         with open(config_path) as config_file:
             self.config = json.load(config_file)
-        self.video = self.load_video(self.config['video_path'])
+        self.video = self.load_video()
         self.current_frame = self.config['starting_frame'] + 1
         self.n_samples = self.config['n_termites']
         self.termites = []
 
         self.create_termites()
 
-    def load_video(self, video_path):
+    def load_video(self):
         try:
-            return pims.Video(video_path)
+            return pims.Video(self.config['video_path'])
         except FileNotFoundError:
             print('Video file not found.')
             sys.exit()
@@ -40,7 +40,6 @@ class GeneralTracker:
             initial_position = self.select_termite(frame)
             termite.tracker = cv2.Tracker_create(self.config['tracking_method'])
             termite.tracker.init(frame, initial_position)
-
             termite.trail.append({'frame': self.config['starting_frame'],
                                  'time': f'{time.strftime("%H:%M:%S", time.gmtime(self.current_frame/self.config["movie_fps"]))}',
                                  'label': termite.label,
@@ -49,7 +48,6 @@ class GeneralTracker:
                                  'y': initial_position[1],
                                  'xoffset': initial_position[2],
                                  'yoffset': initial_position[3]})
-
             self.termites.append(termite)
 
     def select_termite(self, frame):
@@ -125,11 +123,11 @@ class GeneralTracker:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         with open(os.path.join(output_path, 'meta.json'), mode='w') as metafile:
-            json.dump(self._create_meta(), metafile, indent=4)
+            json.dump(self.create_meta(), metafile, indent=4)
         for termite in self.termites:
             termite.to_csv(output_path)
 
-    def _create_meta(self):
+    def create_meta(self):
         meta = {k: self.config[k] for k in ('experiment_name',
                      'conducted_by', 'tracking_method', 'n_termites',
                      'resize_ratio', 'video_path', 'movie_fps',
