@@ -12,6 +12,7 @@ random.seed(42)
 def delta(column):
     return (column.shift(1) - column) ** 2
 
+
 class Termite:
     def __init__(self, caste, number):
         self.caste = caste
@@ -74,31 +75,19 @@ class Nest():
             termite.trail['mean_velocity'] = termite.trail.groupby('time')['displacement'].transform(sum)/movie_fps
 
     def compute_nestmates_distances(self):
-        for termite_a in self.termites:
-            for termite_b in self.termites:
-                if termite_a != termite_b:
-                    distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
-                               ((termite_a.trail['y']-termite_b.trail['y'])**2)))
-                    termite_a.trail[f'distance_to_{termite_b.label}'] = distance
+        for termite in self.termites:
+            for other in self.termites:
+                if termite != other:
+                    distance = np.sqrt((((termite.trail['x']-other.trail['x'])**2) +
+                                        ((termite.trail['y']-other.trail['y'])**2)))
+                    termite.trail[f'distance_to_{other.label}'] = distance
 
     def compute_encounters(self, thresold):
-        '''Check and point encounters between termites.
-
-        Args:
-            thresold (float): distance in pixel units for reporting encounters.
-        Returns:
-            None.
-        '''
-        number_of_frames = len(self.termites[0].trail['frame'])
-        for frame_number in range(1, number_of_frames):
-            print('Computing encounters on frame {} of {}.'.format(frame_number, number_of_frames-1))
-            for n_termite in range(len(self.termites)):
-                predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
-                for other in range(n_termite+1, len(self.termites)):
-                    other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
-                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < thresold:
-                        self.termites[n_termite].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[other].trail.loc[0, 'label'])] = 'encountering'
-                        self.termites[other].trail.loc[frame_number, 'interaction_with_{}'.format(self.termites[n_termite].trail.loc[0, 'label'])] = 'encountering'
+        for termite in self.termites:
+            for other in self.termites:
+                if termite != other:
+                    encounters = termite.trail[f'distance_to_{other.label}'] < thresold
+                    termite.trail[f'encountering_{other.label}'] = encounters
 
     def save(self, output_path):
         output_path = os.path.join(output_path, 'Expanded')
@@ -118,4 +107,5 @@ if __name__ == '__main__':
             nest.compute_displacements()
             nest.compute_mean_velocities(movie_fps=25)
             nest.compute_nestmates_distances()
+            nest.compute_encounters(100)
             nest.save(file_path)
