@@ -3,6 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import random
+import tqdm
 
 import termite as trmt
 
@@ -72,22 +73,13 @@ class Nest():
         for termite in self.termites:
             termite.trail['mean_velocity'] = termite.trail.groupby('time')['displacement'].transform(sum)/movie_fps
 
-    def compute_distances(self):
-        '''Compute distances between each termite.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        for a_number, termite_a in enumerate(self.termites, start=1):
-            print('Computing distances of termite {} of {}.'.format(a_number, len(self.termites)))
-            for b_number, termite_b in enumerate(self.termites, start=1):
-                if a_number != b_number:
+    def compute_nestmates_distances(self):
+        for termite_a in self.termites:
+            for termite_b in self.termites:
+                if termite_a != termite_b:
                     distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
                                ((termite_a.trail['y']-termite_b.trail['y'])**2)))
-                    termite_a.trail['distance_to_t{}'.format(b_number)] = distance
-                    termite_a.trail['interaction_with_t{}'.format(b_number)] = 'no-interaction'
+                    termite_a.trail[f'distance_to_{termite_b.label}'] = distance
 
     def compute_encounters(self, thresold):
         '''Check and point encounters between termites.
@@ -118,11 +110,12 @@ class Nest():
 
 if __name__ == '__main__':
     base_folder = '/media/dmrib/tdata/Syntermes/'
-    for experiment in os.listdir(base_folder):
+    for experiment in tqdm.tqdm(os.listdir(base_folder), desc='Processing nests'):
         for i in range(1,4):
             file_path = f'{os.path.join(base_folder, experiment)}/{experiment}-{i}/'
             nest = Nest(file_path)
             nest.normalize()
             nest.compute_displacements()
             nest.compute_mean_velocities(movie_fps=25)
+            nest.compute_nestmates_distances()
             nest.save(file_path)
