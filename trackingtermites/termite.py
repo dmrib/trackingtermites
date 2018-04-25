@@ -8,6 +8,9 @@ import termite as trmt
 
 random.seed(42)
 
+def delta(column):
+    return (column.shift(1) - column) ** 2
+
 class Termite:
     def __init__(self, caste, number):
         self.caste = caste
@@ -31,7 +34,7 @@ class Termite:
     def to_csv(self, output_path):
         self.to_dataframe()
         self.trail.to_csv(f'{output_path}/{self.label}-trail.csv',
-                     float_format='%.1f')
+                          float_format='%.1f', na_rep='NaN')
 
     def from_csv(self, source_path):
         self.trail = pd.read_csv(source_path)
@@ -58,6 +61,12 @@ class Nest():
         for termite in self.termites:
             termite.normalize()
             termite.trail = termite.trail.drop(columns=['xoffset', 'yoffset'])
+
+    def compute_displacements(self):
+        for termite in self.termites:
+            deltas = termite.trail[['x', 'y']].apply(delta)
+            displacement = np.sqrt(deltas['x'] + deltas['y'])
+            termite.trail['displacement'] = displacement
 
     def compute_distances(self):
         '''Compute distances between each termite.
@@ -110,4 +119,6 @@ if __name__ == '__main__':
             file_path = f'{os.path.join(base_folder, experiment)}/{experiment}-{i}/'
             nest = Nest(file_path)
             nest.normalize()
+            nest.compute_displacements()
+            nest.compute_mean_velocities(movie_fps=25)
             nest.save(file_path)
