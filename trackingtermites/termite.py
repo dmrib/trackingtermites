@@ -68,6 +68,10 @@ class Nest():
             displacement = np.sqrt(deltas['x'] + deltas['y'])
             termite.trail['displacement'] = displacement
 
+    def compute_mean_velocities(self, movie_fps):
+        for termite in self.termites:
+            termite.trail['mean_velocity'] = termite.trail.groupby('time')['displacement'].transform(sum)/movie_fps
+
     def compute_distances(self):
         '''Compute distances between each termite.
 
