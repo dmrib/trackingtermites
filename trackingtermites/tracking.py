@@ -115,7 +115,7 @@ class GeneralTracker:
 
     def print_summary(self):
         for termite in self.termites:
-            print(f'{termite}')
+            print(f'{termite.label}, {len(termite.trail)} steps collected.')
 
     def write_output(self):
         output_path = os.path.join(self.config['output_path'],

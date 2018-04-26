@@ -23,7 +23,7 @@ class Termite:
         self.tracker = None
 
     def __repr__(self):
-        return f'{self.label}, {len(self.trail)} steps collected.'
+        return f'{self.label}'
 
     @property
     def label(self):
@@ -46,7 +46,7 @@ class Termite:
         self.trail['y'] = self.trail['y'] + self.trail['yoffset']//2
 
 
-class Nest():
+class Experiment():
     def __init__(self, source_folder):
         self.termites = []
         self.load_termites(source_folder)
@@ -82,11 +82,11 @@ class Nest():
                                         ((termite.trail['y']-other.trail['y'])**2)))
                     termite.trail[f'distance_to_{other.label}'] = distance
 
-    def compute_encounters(self, thresold):
+    def compute_encounters(self, threshold):
         for termite in self.termites:
             for other in self.termites:
                 if termite != other:
-                    encounters = termite.trail[f'distance_to_{other.label}'] < thresold
+                    encounters = termite.trail[f'distance_to_{other.label}'] < threshold
                     termite.trail[f'encountering_{other.label}'] = encounters
 
     def save(self, output_path):
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     for experiment in tqdm.tqdm(os.listdir(base_folder), desc='Processing nests'):
         for i in range(1,4):
             file_path = f'{os.path.join(base_folder, experiment)}/{experiment}-{i}/'
-            nest = Nest(file_path)
+            nest = Experiment(file_path)
             nest.normalize()
             nest.compute_displacements()
             nest.compute_mean_velocities(movie_fps=25)
