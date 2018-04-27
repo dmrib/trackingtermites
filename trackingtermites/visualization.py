@@ -17,11 +17,10 @@ class TrackingVisualization():
 
         self.coordinates = []
         self.nest = trmt.Experiment(self.config['source_folder'])
-        self.nest.normalize()
         self.video = self.load_video()
 
     def load_video(self):
-        output_path = f'{os.path.join(self.config["source_folder"], "Videos/")}'
+        output_path = f'{os.path.join(self.config["output_path"], "Videos/")}'
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         if self.config['save_output']:
@@ -70,59 +69,33 @@ class TrackingVisualization():
 
 
 class NetworkVisualization(TrackingVisualization):
-    def _compute_distances(self):
-        '''Compute distances between termites on every experiment frame and
-           updates dataframes.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        for a_number, termite_a in enumerate(self.termites, start=1):
-            for b_number, termite_b in enumerate(self.termites, start=1):
-                if a_number != b_number:
-                    distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
-                               ((termite_a.trail['y']-termite_b.trail['y'])**2)))
-                    termite_a.trail['distance_to_t{}'.format(b_number)] = distance
-                    termite_a.trail['interaction_with_t{}'.format(b_number)] = 'no-interaction'
-
     def show(self):
-        '''Start tracking session visualization.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        self._compute_distances()
-        for frame_number in range(1, len(self.termites[0].trail['frame'])):
-            playing, self.frame = self.video.read()
-            self.frame = cv2.resize(self.frame, (0,0), fx=self.settings['resize_ratio'],
-                               fy=self.settings['resize_ratio'])
-            self._draw_frame_info()
-
-            for n_termite in range(len(self.termites)):
-                predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
-                cv2.circle(self.frame, predicted, 3, self.termites[n_termite].color, -1)
-                cv2.putText(self.frame, self.termites[n_termite].trail.loc[frame_number,'label'], (predicted[0]+5, predicted[1]+5), 2,
-                            color=self.termites[n_termite].color, fontScale=0.3)
-                for other in range(n_termite+1, len(self.termites)):
-                    other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
-                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < 65:
-                        cv2.line(self.frame, predicted, other_predicted, (0,0,255), 1)
-                        half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
-                        cv2.circle(self.frame, half, 3, (255, 0, 0), -1)
-
-            self.out.write(self.frame)
-            cv2.imshow('Labeling...', self.frame)
-            pressed_key = cv2.waitKey(1) & 0xff
+        self.step = 0
+        while self.step < len(self.video):
+            frame = self.get_frame(self.step)
+            for termite in self.nest.termites:
+                self.draw_termites(frame)
+                self.draw_connections(frame)
+            cv2.imshow(self.config['experiment_name'], frame)
+            self.output.writeFrame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            pressed_key = cv2.waitKey(self.config['movie_speed']) & 0xff
             if pressed_key == 27:
-                self.output.release()
+                self.output.close()
                 sys.exit()
+            self.step += 1
         cv2.destroyAllWindows()
+        self.output.close()
+
+    def draw_connections(self, frame):
+        for termite in self.nest.termites:
+            for other in self.nest.termites:
+                if termite != other:
+                    if termite.trail.loc[self.step, f'encountering_{other.label}']:
+                        cv2.line(frame, (termite.trail.loc[self.step, 'x'], termite.trail.loc[self.step, 'y']),
+                                (other.trail.loc[self.step, 'x'], other.trail.loc[self.step, 'y']),
+                                (55,31,122), 3)
 
 
 if __name__ == '__main__':
-    vis = TrackingVisualization('settings/visualization.json')
+    vis = NetworkVisualization('settings/visualization.json')
     vis.show()
