@@ -4,120 +4,53 @@ import json
 import numpy as np
 import os
 import pandas as pd
+import pims
+import skimage
 import sys
+import tqdm
+
 import termite as trmt
 
 
 class Scraper():
     def __init__(self, settings_path):
-        '''Initializer.
+        with open(settings_path) as settings_file:
+            self.config = json.load(settings_file)
+        if not os.path.exists(self.config['output_path']):
+            os.makedirs(self.config['output_path'])
+        self.nest = trmt.Experiment(self.config['source_folder'])
+        self.video = self.load_video()
 
-        Args:
-            settings_path (str): path to settings file.
-        Returns:
-            None.
-        '''
-        self.termites = []
+    def load_video(self):
+        try:
+            return pims.Video(self.config['video_path'])
+        except FileNotFoundError:
+            print('Video file not found.')
+            sys.exit()
 
-        self._load_settings(settings_path)
-        self._load_metadata()
-        self._load_termites()
-
-        self.video = cv2.VideoCapture(self.metadata['video_path'])
-
-    def _load_metadata(self):
-        '''Load tracking metadata file.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        with open(os.path.join(self.settings['source_folder'], 'meta.json')) as metadata:
-            self.metadata = json.load(metadata)
-
-    def _load_settings(self, settings_file):
-        '''Load labeling session settings file.
-
-        Args:
-            settings_file (str): path to tracking session settings file.
-        Retuns:
-            None.
-        '''
-        with open(settings_file) as settings:
-            self.settings = json.load(settings)
-
-    def _load_termites(self):
-        '''Load termite data.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        for termite_number in range(1, self.metadata['n_termites'] + 1):
-            label = 't' + str(termite_number)
-            file_name = '{}-trail.csv'.format(label)
-            file_path = os.path.join(self.settings['source_folder'], file_name)
-            termite = trmt.Termite(label)
-            termite.from_csv(file_path)
-            self.termites.append(termite)
-
-        self._compute_distances()
-
-    def _compute_distances(self):
-        '''Compute distances between termites on every experiment frame and
-           updates dataframes.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        for termite in self.termites:
-            termite.trail['x'] = termite.trail['x'] + termite.trail['xoffset']/2
-            termite.trail['y'] = termite.trail['y'] + termite.trail['yoffset']/2
-
-        for a_number, termite_a in enumerate(self.termites, start=1):
-            for b_number, termite_b in enumerate(self.termites, start=1):
-                if a_number != b_number:
-                    distance = np.sqrt((((termite_a.trail['x']-termite_b.trail['x'])**2) +
-                               ((termite_a.trail['y']-termite_b.trail['y'])**2)))
-                    termite_a.trail['distance_to_t{}'.format(b_number)] = distance
-                    termite_a.trail['interaction_with_t{}'.format(b_number)] = 'no-interaction'
+    def get_frame(self, frame_number):
+        frame = self.video[frame_number]
+        frame = cv2.resize(frame, (0,0), fx=self.config['resize_ratio'],
+                           fy=self.config['resize_ratio'])
+        return frame
 
     def scrape(self):
-        '''Starts labeling session.
-
-        Args:
-            None.
-        Returns:
-            None.
-        '''
-        if not os.path.exists(self.settings['output_path']):
-            os.makedirs(self.settings['output_path'])
-
-        entries_number = len(self.termites[0].trail['frame'].values)
-
-        for frame_number in range(1, entries_number):
-            playing, frame = self.video.read()
-            if not playing:
-                print('The end.')
-                sys.exit()
-            frame = cv2.resize(frame, (0,0), fx=self.metadata['resize_ratio'],
-                               fy=self.metadata['resize_ratio'])
-            print('Scraping on frame {} of {}'.format(frame_number, entries_number-1))
-
-            for n_termite in range(len(self.termites)):
-                predicted = (int(self.termites[n_termite].trail.loc[frame_number, 'x']), int(self.termites[n_termite].trail.loc[frame_number, 'y']))
-                for other in range(n_termite+1, len(self.termites)):
-                    other_predicted = (int(self.termites[other].trail.loc[frame_number, 'x']), int(self.termites[other].trail.loc[frame_number, 'y']))
-                    if self.termites[n_termite].trail.loc[frame_number, 'distance_to_{}'.format(self.termites[other].trail.loc[0, 'label'])] < self.settings['distance_threshold']:
-                        half = ((predicted[0]+other_predicted[0])//2, (predicted[1]+other_predicted[1])//2)
-                        event = frame[(half[1]-self.settings['collection_edge']):(half[1]+self.settings['collection_edge']),
-                                      (half[0]-self.settings['collection_edge']):(half[0]+self.settings['collection_edge'])]
-                        cv2.imwrite(os.path.join(self.settings['output_path'],
-                                    '{}-t{}-t{}.jpg'.format(frame_number, n_termite, other)), event)
+        for self.step in tqdm.tqdm(range(0,len(self.video),30)):
+            frame = self.get_frame(self.step)
+            for termite in self.nest.termites:
+                for other in self.nest.termites:
+                    if termite != other:
+                        if termite.trail.loc[self.step, f'encountering_{other.label}']:
+                            termite_pos = (termite.trail.loc[self.step, 'x'],
+                                           termite.trail.loc[self.step, 'y'])
+                            other_pos = (other.trail.loc[self.step, 'x'],
+                                         other.trail.loc[self.step, 'y'])
+                            half = ((termite_pos[0]+other_pos[0])//2,
+                                    (termite_pos[1]+other_pos[1])//2)
+                            event = frame[(half[1]-self.config['termite_size']):(half[1]+self.config['termite_size']),
+                                          (half[0]-self.config['termite_size']):(half[0]+self.config['termite_size'])]
+                            path = os.path.join(self.config['output_path'], f'{termite.label}-{other.label}-{self.step}.jpg')
+                            skimage.io.imsave(path, event)
 
 
 if __name__ == '__main__':

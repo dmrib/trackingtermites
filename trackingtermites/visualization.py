@@ -11,8 +11,8 @@ import termite as trmt
 
 
 class TrackingVisualization():
-    def __init__(self, settings_file_path):
-        with open(settings_file_path) as settings_file:
+    def __init__(self, settings_path):
+        with open(settings_path) as settings_file:
             self.config = json.load(settings_file)
 
         self.coordinates = []

@@ -2,11 +2,9 @@
     "experiment_name": "Sample Experiment",
     "source_folder": "data/Sample Experiment",
     "conducted_by": "UFV Termitology Lab",
-    "video_path": "data/sample.mp4",
-    "output_path": "data/Sample Experiment/Images/raw/",
-    "n_termites": 4,
+    "video_path": "/media/dmrib/tdata/Syntermes/N11HHS2018-8W4S/N11HHS2018-8W4S-V1.MP4",
+    "source_folder": "/media/dmrib/tdata/Syntermes/N11HHS2018-8W4S/N11HHS2018-8W4S-1/Expanded/",
+    "output_path": "/media/dmrib/tdata/Syntermes/N11HHS2018-8W4S/N11HHS2018-8W4S-1/Images/",
     "resize_ratio": 0.5,
-    "movie_speed": 1,
-    "collection_edge": 30,
-    "distance_threshold": 60
+    "termite_size": 60
 }
