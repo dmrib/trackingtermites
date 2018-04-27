@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 import pims
+from skvideo.io import FFmpegWriter
 import sys
 
 import termite as trmt
@@ -15,29 +16,22 @@ class TrackingVisualization():
             self.config = json.load(settings_file)
 
         self.coordinates = []
-        self.nest = trmt.Nest(self.config['source_folder'])
+        self.nest = trmt.Experiment(self.config['source_folder'])
         self.nest.normalize()
         self.video = self.load_video()
 
     def load_video(self):
+        output_path = f'{os.path.join(self.config["source_folder"], "Videos/")}'
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        if self.config['save_output']:
+            self.output = FFmpegWriter(f'{output_path}tracking.mp4',
+                                       outputdict={'-vcodec': 'libx264'})
         try:
             return pims.Video(self.config['video_path'])
         except FileNotFoundError:
             print('Video file not found.')
             sys.exit()
-
-    def show(self):
-        self.step = 0
-        while self.step < len(self.video):
-            frame = self.get_frame(self.step)
-            for termite in self.nest.termites:
-                self.draw_termites(frame)
-            cv2.imshow(self.config['experiment_name'], frame)
-            pressed_key = cv2.waitKey(self.config['movie_speed']) & 0xff
-            if pressed_key == 27:
-                sys.exit()
-            self.step += 1
-        cv2.destroyAllWindows()
 
     def get_frame(self, frame_number):
         frame = self.video[frame_number]
@@ -56,6 +50,24 @@ class TrackingVisualization():
             cv2.circle(frame, position, 8, termite.color, 2)
             cv2.putText(frame, termite.label, (position[0]-7, position[1]-11), 2,
                         color=termite.color, fontScale=0.4)
+
+    def show(self):
+        self.step = 0
+        while self.step < len(self.video):
+            frame = self.get_frame(self.step)
+            for termite in self.nest.termites:
+                self.draw_termites(frame)
+            cv2.imshow(self.config['experiment_name'], frame)
+            if self.config['save_output']:
+                self.output.writeFrame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            pressed_key = cv2.waitKey(self.config['movie_speed']) & 0xff
+            if pressed_key == 27:
+                self.output.close()
+                sys.exit()
+            self.step += 1
+        cv2.destroyAllWindows()
+        self.output.close()
+
 
 class NetworkVisualization(TrackingVisualization):
     def _compute_distances(self):
@@ -106,6 +118,7 @@ class NetworkVisualization(TrackingVisualization):
             cv2.imshow('Labeling...', self.frame)
             pressed_key = cv2.waitKey(1) & 0xff
             if pressed_key == 27:
+                self.output.release()
                 sys.exit()
         cv2.destroyAllWindows()
 

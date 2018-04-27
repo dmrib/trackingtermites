@@ -1,9 +1,10 @@
 {
     "experiment_name": "Sample Experiment",
     "conducted_by": "UFV Termitology Lab",
-    "video_path": "data/sample.mp4",
-    "source_folder": "data/Sample Experiment/",
-    "n_termites": 4,
+    "video_path": "/media/dmrib/tdata/Syntermes/N11HHS2018-8W4S/N11HHS2018-8W4S-V1.MP4",
+    "source_folder": "/media/dmrib/tdata/Syntermes/N11HHS2018-8W4S/N11HHS2018-8W4S-1/",
+    "save_output": true,
+    "n_termites": 24,
     "resize_ratio": 0.5,
     "movie_speed": 1
 }
