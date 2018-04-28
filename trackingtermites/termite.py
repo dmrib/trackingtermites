@@ -107,5 +107,5 @@ if __name__ == '__main__':
             nest.compute_displacements()
             nest.compute_mean_velocities(movie_fps=25)
             nest.compute_nestmates_distances()
-            nest.compute_encounters(100)
+            nest.compute_encounters(140)
             nest.save(file_path)
