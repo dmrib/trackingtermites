@@ -43,29 +43,34 @@ class TrackingVisualization():
 
     def draw_termites(self, frame):
         for termite in self.nest.termites:
-            position = (termite.trail.loc[self.step,'x'],
-                        termite.trail.loc[self.step,'y'])
-            cv2.circle(frame, position, 3, termite.color, -1)
-            cv2.circle(frame, position, 8, termite.color, 2)
-            cv2.putText(frame, termite.label, (position[0]-7, position[1]-11), 2,
-                        color=termite.color, fontScale=0.4)
+            try:
+                position = (termite.trail.loc[self.step,'x'],
+                            termite.trail.loc[self.step,'y'])
+                cv2.circle(frame, position, 3, termite.color, -1)
+                cv2.circle(frame, position, 8, termite.color, 2)
+                cv2.putText(frame, termite.label, (position[0]-7, position[1]-11), 2,
+                            color=termite.color, fontScale=0.4)
+            except Exception:
+                print(f'{termite.label} lost at frame {self.step}.')
+                return
 
     def show(self):
         self.step = 0
         while self.step < len(self.video):
             frame = self.get_frame(self.step)
-            for termite in self.nest.termites:
-                self.draw_termites(frame)
+            self.draw_termites(frame)
             cv2.imshow(self.config['experiment_name'], frame)
             if self.config['save_output']:
                 self.output.writeFrame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             pressed_key = cv2.waitKey(self.config['movie_speed']) & 0xff
             if pressed_key == 27:
-                self.output.close()
+                if self.config['save_output']:
+                    self.output.close()
                 sys.exit()
             self.step += 1
         cv2.destroyAllWindows()
-        self.output.close()
+        if self.config['save_output']:
+            self.output.close()
 
 
 class NetworkVisualization(TrackingVisualization):
@@ -73,9 +78,8 @@ class NetworkVisualization(TrackingVisualization):
         self.step = 0
         while self.step < len(self.video):
             frame = self.get_frame(self.step)
-            for termite in self.nest.termites:
-                self.draw_termites(frame)
-                self.draw_connections(frame)
+            self.draw_termites(frame)
+            self.draw_connections(frame)
             cv2.imshow(self.config['experiment_name'], frame)
             self.output.writeFrame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             pressed_key = cv2.waitKey(self.config['movie_speed']) & 0xff
@@ -97,5 +101,5 @@ class NetworkVisualization(TrackingVisualization):
 
 
 if __name__ == '__main__':
-    vis = NetworkVisualization('settings/visualization.json')
+    vis = TrackingVisualization('settings/visualization.json')
     vis.show()

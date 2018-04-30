@@ -39,7 +39,7 @@ class Termite:
                           float_format='%.1f', na_rep='NaN')
 
     def from_csv(self, source_path):
-        self.trail = pd.read_csv(source_path)
+        self.trail = pd.read_csv(source_path, index_col=0)
 
     def normalize(self):
         self.trail['x'] = self.trail['x'] + self.trail['xoffset']//2
