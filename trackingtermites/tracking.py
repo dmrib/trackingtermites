@@ -125,6 +125,7 @@ class GeneralTracker:
         with open(os.path.join(output_path, 'meta.json'), mode='w') as metafile:
             json.dump(self.create_meta(), metafile, indent=4)
         for termite in self.termites:
+            termite.to_dataframe()
             termite.to_csv(output_path)
 
     def create_meta(self):

@@ -51,7 +51,7 @@ class TrackingVisualization():
                 cv2.putText(frame, termite.label, (position[0]-7, position[1]-11), 2,
                             color=termite.color, fontScale=0.4)
             except Exception:
-                print(f'{termite.label} lost at frame {self.step}.')
+                print(f'No entry for {termite.label} in frame {self.step}.')
                 return
 
     def show(self):
@@ -81,14 +81,17 @@ class NetworkVisualization(TrackingVisualization):
             self.draw_termites(frame)
             self.draw_connections(frame)
             cv2.imshow(self.config['experiment_name'], frame)
-            self.output.writeFrame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            if self.config['save_output']:
+                self.output.writeFrame(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             pressed_key = cv2.waitKey(self.config['movie_speed']) & 0xff
             if pressed_key == 27:
-                self.output.close()
+                if self.config['save_output']:
+                    self.output.close()
                 sys.exit()
             self.step += 1
         cv2.destroyAllWindows()
-        self.output.close()
+        if self.config['save_output']:
+            self.output.close()
 
     def draw_connections(self, frame):
         for termite in self.nest.termites:
@@ -101,5 +104,5 @@ class NetworkVisualization(TrackingVisualization):
 
 
 if __name__ == '__main__':
-    vis = TrackingVisualization('settings/visualization.json')
+    vis = NetworkVisualization('settings/visualization.json')
     vis.show()

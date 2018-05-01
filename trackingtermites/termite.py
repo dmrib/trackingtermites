@@ -34,7 +34,6 @@ class Termite:
         self.trail = self.trail.set_index('frame')
 
     def to_csv(self, output_path):
-        self.to_dataframe()
         self.trail.to_csv(f'{output_path}/{self.label}-trail.csv',
                           float_format='%.1f', na_rep='NaN')
 
@@ -107,5 +106,5 @@ if __name__ == '__main__':
             nest.compute_displacements()
             nest.compute_mean_velocities(movie_fps=25)
             nest.compute_nestmates_distances()
-            nest.compute_encounters(140)
+            nest.compute_encounters(100)
             nest.save(file_path)
