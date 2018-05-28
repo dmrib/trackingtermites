@@ -65,21 +65,25 @@ class GeneralTracker:
     def update_termites(self, frame):
         for termite in self.termites:
             found, position = termite.tracker.update(frame)
+            while not found:
+                print(f'Termite {termite} lost.')
+                self.restart_tracker(frame, termite.number)
+                found, position = termite.tracker.update(frame)
             position = [int(x) for x in position]
-            if not found:
-                print('Termite lost.')
-            else:
-                termite.trail.append({'frame': self.current_frame,
-                                     'time': f'{time.strftime("%H:%M:%S", time.gmtime(self.current_frame/self.config["movie_fps"]))}',
-                                     'label': termite.label,
-                                     'caste': termite.caste,
-                                     'x': position[0],
-                                     'y': position[1],
-                                     'xoffset': position[2],
-                                     'yoffset': position[3]})
+            termite.trail.append({'frame': self.current_frame,
+                                  'time': f'{time.strftime("%H:%M:%S", time.gmtime(self.current_frame/self.config["movie_fps"]))}',
+                                  'label': termite.label,
+                                  'caste': termite.caste,
+                                  'x': position[0],
+                                  'y': position[1],
+                                  'xoffset': position[2],
+                                  'yoffset': position[3]})
 
-    def restart_tracker(self, frame):
-        to_restart = int(input('Termite number: ')) - 1
+    def restart_tracker(self, frame, number=0):
+        if number:
+            to_restart = number - 1
+        else:
+            to_restart = int(input('Termite number: ')) - 1
         position = self.select_termite(frame)
         self.termites[to_restart].tracker = cv2.Tracker_create(self.config['tracking_method'])
         self.termites[to_restart].tracker.init(frame, position)
@@ -182,5 +186,7 @@ class GeneralTracker:
         self.write_output()
         self.print_summary()
 
-tracker = GeneralTracker('settings/tracking.json')
-tracker.track()
+
+if __name__ == '__main__':
+    tracker = GeneralTracker('settings/tracking.json')
+    tracker.track()
