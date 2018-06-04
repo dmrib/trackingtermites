@@ -5,28 +5,27 @@
 About
 ===============
 
-_TrackingTermites_ is a set of tools designed to facilitate the tracking of termites
-samples in experiments footage video (mostly involving confinement in Petri plates).
+These are tools that helps biologists extract data from experiments videos of termites under
+confinement (mostly in petri dishes).
 
-We're currently able to track the samples positions, their encounters with other
-individuals and the distances between them. Useful image preprocessing filters are
-also included.
+We're currently able to track the samples positions, compute velocities, distances and detect
+encounters between individuals. Encounters can be further classified automatically as actual
+interactions or not.
 
-[![Demo](http://img.youtube.com/vi/oenoPR35KxI/0.jpg)](http://www.youtube.com/watch?v=oenoPR35KxI)
+[![Demo](https://img.youtube.com/vi/1OERWG7F74c/0.jpg)](https://www.youtube.com/watch?v=1OERWG7F74c)
 
-[![Demo](http://img.youtube.com/vi/yKXcV2L-ilY/0.jpg)](http://www.youtube.com/watch?v=yKXcV2L-ilY)
+[![Demo](https://img.youtube.com/vi/BcPc1BXg5vc/0.jpg)](https://www.youtube.com/watch?v=BcPc1BXg5vcY)
 
 The project is conducted at [Federal University of Viçosa Termitology Lab](https://www.isoptera.ufv.br/).
 
-Code tested on Windows 10 and Ubuntu 16.04, requires Python >= 3.5.X, OpenCV == 3.0.2,
-Numpy >= 1.13.1.
+Code tested on Ubuntu 16.04, requires Python >= 3.6.X.
 
 Getting started
 ===============
 
 ### Windows
 
-On Windows we recommend that you install Python 3 via the [official website](https://www.python.org/) and
+On Windows we recommend that you install Python 3.6 via the [official website](https://www.python.org/) and
 download or clone the source code repository. Them proceed as follow:
 
 * Inside the _trackingtermites/_ folder, locate the requirements.txt and install dependencies by
@@ -48,7 +47,7 @@ The output is written at the specified path at the configuration file.
 
 ### Ubuntu
 
-Installing OpenCV in Ubuntu is being troublesome lately, for your convenience we provide a script
+Installing OpenCV in Ubuntu is being troublesome lately. For your convenience we provide a script
 for installation at a [GitHub Gist](https://gist.github.com/dmrib/b2bc06ed8bcf583686e26af6b06f1675).
 
 The script install the required packages and creates a virtual environment containing an OpenCV
