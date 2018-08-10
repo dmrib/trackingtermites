@@ -1,15 +1,15 @@
 {
-    "experiment_name": "N12HHS2018-24W-1",
+    "experiment_name": "sample-dataset",
     "conducted_by": "UFV Termitology Lab",
-    "video_path": "/media/dmrib/tdata/Syntermes/N12HHS2018-24W/N12HHS2018-24W-V1.MP4",
-    "movie_fps": 25,
+    "video_path": "/media/dmrib/dmrib-flash/Videos/sample.MP4",
+    "movie_fps": 30.125,
     "tracking_method": "KCF",
-    "output_path": "/media/dmrib/tdata/Syntermes/N12HHS2018-24W/",
+    "output_path": "/media/dmrib/dmrib-flash/Trails/",
     "starting_frame": 0,
-    "n_termites": 24,
+    "n_termites": 4,
     "query_caste": false,
     "default_caste_label": "W",
-    "resize_ratio": 0.5,
+    "resize_ratio": 0.8,
     "speed": 1,
     "rewind_steps": 30
 }

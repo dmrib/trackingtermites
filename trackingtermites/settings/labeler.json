@@ -1,8 +1,0 @@
-{
-    "source_folder": "data/Sample Experiment",
-    "images_folder": "/media/dmrib/tdata/Syntermes/N11HHS2018-8W4S/N11HHS2018-8W4S-1/Images/",
-    "events": {
-                "1": "interacting",
-                "2": "not-interacting"
-              }
-}

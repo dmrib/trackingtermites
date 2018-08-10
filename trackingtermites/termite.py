@@ -99,14 +99,12 @@ class Experiment():
 
 
 if __name__ == '__main__':
-    base_folder = '/media/dmrib/tdata/Syntermes/'
-    for experiment in tqdm.tqdm(os.listdir(base_folder), desc='Processing nests'):
-        for i in range(1,4):
-            file_path = f'{os.path.join(base_folder, experiment)}/{experiment}-{i}/'
-            nest = Experiment(file_path)
-            nest.normalize()
-            nest.compute_displacements()
-            nest.compute_mean_velocities(movie_fps=25)
-            nest.compute_nestmates_distances()
-            nest.compute_encounters(100)
-            nest.save(file_path)
+    base_folder = '/media/dmrib/dmrib-flash/Trails/sample-dataset/'
+
+    nest = Experiment(base_folder)
+    nest.normalize()
+    nest.compute_displacements()
+    nest.compute_mean_velocities(movie_fps=31.125)
+    nest.compute_nestmates_distances()
+    nest.compute_encounters(40)
+    nest.save('/media/dmrib/dmrib-flash/Trails/sample-dataset/')
