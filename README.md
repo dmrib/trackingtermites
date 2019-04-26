@@ -67,6 +67,10 @@ Remember to always activate the virtual environment before running the script:
    workon trackingtermites
 ```
 
+Funding
+===============
+
+FAPEMIG (Fundação de Amparo à Pesquisa do Estado de Minas Gerais)
 
 License
 ===============
